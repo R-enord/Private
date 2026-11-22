@@ -1,0 +1,15 @@
+# User service: keeps collecting while you are logged out of the browser (and across reboots with lingering).
+# Install: cp deploy/systemd/hub-*.service ~/.config/systemd/user/ && systemctl --user daemon-reload
+#          systemctl --user enable --now hub-worker hub-server   (optional: loginctl enable-linger $USER)
+[Unit]
+Description=AI Intelligence Hub web server (127.0.0.1:8000)
+After=network-online.target postgresql.service
+
+[Service]
+WorkingDirectory=%h/Private/backend
+ExecStart=%h/.local/bin/uv run hub serve
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

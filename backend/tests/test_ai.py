@@ -194,3 +194,11 @@ def test_grounding_helpers() -> None:
     clean, removed = validate_summary({"summary": "A 7B model. Pricing is $0.50.", "what_it_is": "", "key_points": [],
                                        "maturity": "ga-release"}, src, ["llm"], ["release", "unknown"])
     assert clean["summary"] == "A 7B model." and clean["maturity"] == "unknown" and removed
+
+
+def test_trusted_container_host_allowed_but_never_ollama_com() -> None:
+    OllamaProvider("http://ollama:11434", trusted_hosts=("ollama",))
+    with pytest.raises(CostPolicyViolation):
+        OllamaProvider("http://ollama:11434")
+    with pytest.raises(CostPolicyViolation):
+        OllamaProvider("https://ollama.com", trusted_hosts=("ollama.com",))

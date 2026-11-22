@@ -1,0 +1,50 @@
+# Local-only stack. Every published port is bound to 127.0.0.1 — never expose it publicly without the
+# steps in SECURITY.md. Start: `docker compose up -d`; first run: `docker compose run --rm api hub migrate`
+# and `docker compose run --rm api hub create-owner`.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hub
+      POSTGRES_PASSWORD: ${HUB_DB_PASSWORD:?set HUB_DB_PASSWORD in .env}
+      POSTGRES_DB: hub
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hub -d hub"]
+      interval: 10s
+      retries: 10
+    ports: ["127.0.0.1:5432:5432"]
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    environment:
+      OLLAMA_NO_CLOUD: "1"        # disable paid cloud models + web search
+      OLLAMA_HOST: "0.0.0.0:11434" # inside the compose network only (port not published publicly)
+    volumes: [ollama:/root/.ollama]
+    ports: ["127.0.0.1:11434:11434"]
+    profiles: ["ai"]              # opt in: `docker compose --profile ai up -d`
+
+  api: &app
+    build: .
+    restart: unless-stopped
+    depends_on: { db: { condition: service_healthy } }
+    environment: &env
+      HUB_DATABASE_URL: postgresql+psycopg://hub:${HUB_DB_PASSWORD}@db:5432/hub
+      HUB_BIND_HOST: 0.0.0.0               # container-internal; published only on 127.0.0.1 below
+      HUB_PUBLIC_ACCESS_APPROVED: "true"   # acknowledges the 0.0.0.0 bind INSIDE the container only
+      HUB_ALLOWED_HOSTS: '["127.0.0.1","localhost"]'
+      HUB_OLLAMA_URL: http://ollama:11434
+      HUB_OLLAMA_TRUSTED_HOSTS: '["ollama"]'
+      HUB_GITHUB_TOKEN: ${HUB_GITHUB_TOKEN:-}
+    volumes: [hubdata:/app/data]
+    ports: ["127.0.0.1:8000:8000"]
+    command: ["hub", "serve"]
+
+  worker:
+    <<: *app
+    ports: []
+    command: ["hub", "worker"]
+
+volumes: { pgdata: {}, ollama: {}, hubdata: {} }

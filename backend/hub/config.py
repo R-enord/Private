@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     ollama_model: str = ""  # empty = auto-pick an installed local model
     ollama_embed_model: str = ""  # empty = auto-pick (e.g. all-minilm / nomic-embed-text)
     ollama_allow_lan: bool = False  # allow a private-network (non-loopback) Ollama host
+    # Explicit container-network hostnames that are local to this installation (e.g. "ollama" in Docker Compose,
+    # "host.docker.internal"). Never put public hostnames here.
+    ollama_trusted_hosts: list[str] = Field(default_factory=list)
     ai_num_ctx: int = 4096
     ai_timeout_s: float = 180.0
     ai_max_concurrency: int = 1

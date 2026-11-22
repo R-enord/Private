@@ -43,8 +43,11 @@ def create_backup(keep: int = 14) -> Path:
     stamp = dt.datetime.now(dt.UTC).strftime("%Y%m%d-%H%M%S")
     out = backup_dir() / f"hub-{stamp}.dump"
     args, env = _libpq(settings.database_url)
-    subprocess.run([_bin("pg_dump"), "-Fc", "--no-owner", "-f", str(out), *args], check=True, env=env,  # noqa: S603
-                   capture_output=True, timeout=3600)
+    proc = subprocess.run([_bin("pg_dump"), "-Fc", "--no-owner", "-f", str(out), *args], env=env,  # noqa: S603
+                          capture_output=True, text=True, timeout=3600)
+    if proc.returncode != 0:
+        out.unlink(missing_ok=True)
+        raise RuntimeError(f"pg_dump failed: {proc.stderr.strip()[:2000]}")
     files = sorted(backup_dir().glob("hub-*.dump"))
     for old in files[:-keep]:
         old.unlink(missing_ok=True)
@@ -52,12 +55,34 @@ def create_backup(keep: int = 14) -> Path:
 
 
 def restore_backup(file: Path, database_url: str | None = None) -> None:
-    """Destructive: replaces objects in the target database with the backup's contents."""
+    """Destructive: replaces objects in the target database with the backup's contents.
+
+    Extensions are skipped in the restore list (they may be owned by the database superuser, e.g. when inherited
+    from template1, and must not be dropped by the app role); pg_trgm is ensured beforehand instead.
+    """
     if not file.exists():
         raise FileNotFoundError(file)
-    args, env = _libpq(database_url or get_settings().database_url)
-    subprocess.run([_bin("pg_restore"), "--clean", "--if-exists", "--no-owner", "--single-transaction", *args, str(file)],  # noqa: S603
-                   check=True, env=env, capture_output=True, timeout=3600)
+    url = database_url or get_settings().database_url
+    args, env = _libpq(url)
+    from sqlalchemy import create_engine, text
+
+    eng = create_engine(url)
+    with eng.begin() as c:
+        c.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+    eng.dispose()
+    toc = subprocess.run([_bin("pg_restore"), "-l", str(file)], check=True, capture_output=True, text=True,  # noqa: S603
+                         timeout=300).stdout
+    kept = [line for line in toc.splitlines() if " EXTENSION " not in line]
+    list_file = file.with_suffix(".restore-list")
+    list_file.write_text("\n".join(kept) + "\n")
+    try:
+        proc = subprocess.run([_bin("pg_restore"), "--clean", "--if-exists", "--no-owner", "--single-transaction",  # noqa: S603
+                               "-L", str(list_file), *args, str(file)], env=env, capture_output=True, text=True,
+                              timeout=3600)
+    finally:
+        list_file.unlink(missing_ok=True)
+    if proc.returncode != 0:
+        raise RuntimeError(f"pg_restore failed: {proc.stderr.strip()[:2000]}")
 
 
 def list_backups() -> list[dict[str, Any]]:

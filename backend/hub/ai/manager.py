@@ -66,7 +66,8 @@ class ProviderManager:
         errs: dict[str, str] = {}
         try:
             out.append(OllamaProvider(s.ollama_url, s.ollama_model, s.ollama_embed_model, num_ctx=s.ai_num_ctx,
-                                      timeout_s=s.ai_timeout_s, allow_lan=s.ollama_allow_lan))
+                                      timeout_s=s.ai_timeout_s, allow_lan=s.ollama_allow_lan,
+                                      trusted_hosts=tuple(h.lower() for h in s.ollama_trusted_hosts)))
         except (CostPolicyViolation, EgressDenied) as e:
             errs["ollama-local"] = f"blocked: {e}"
         # Cloud adapters: none verified (see cost_guard.VERIFIED_FREE_TIER_POLICIES). Even with

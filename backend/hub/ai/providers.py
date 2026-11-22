@@ -68,8 +68,8 @@ class AIProvider(ABC):
     def embed(self, texts: list[str]) -> list[list[float]]: ...
 
 
-def _is_local_host(host: str, allow_lan: bool) -> bool:
-    if host in ("localhost", "127.0.0.1", "::1"):
+def _is_local_host(host: str, allow_lan: bool, trusted: tuple[str, ...] = ()) -> bool:
+    if host in ("localhost", "127.0.0.1", "::1") or host in trusted:
         return True
     try:
         ip = ipaddress.ip_address(host)
@@ -96,12 +96,12 @@ class OllamaProvider(AIProvider):
 
     def __init__(self, base_url: str, model: str = "", embed_model: str = "", *, num_ctx: int = 4096,
                  timeout_s: float = 180.0, allow_lan: bool = False, transport: httpx.BaseTransport | None = None,
-                 key: str = "ollama-local"):
+                 key: str = "ollama-local", trusted_hosts: tuple[str, ...] = ()):
         parts = urlsplit(base_url)
         host = (parts.hostname or "").lower()
         if parts.scheme not in ("http", "https") or not host:
             raise EgressDenied(f"invalid Ollama URL {base_url!r}")
-        if not _is_local_host(host, allow_lan):
+        if host in cost_guard.PAID_OR_UNVERIFIED_HOSTS or not _is_local_host(host, allow_lan, trusted_hosts):
             raise CostPolicyViolation(
                 f"Ollama host {host} is not local; remote inference endpoints are not allowed (zero-cost/privacy)")
         self.key = key

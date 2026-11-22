@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- macOS: copy to ~/Library/LaunchAgents/, edit paths, then `launchctl load -w ~/Library/LaunchAgents/local.ai-hub.worker.plist` -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>local.ai-hub.worker</string>
+  <key>WorkingDirectory</key><string>/Users/YOU/Private/backend</string>
+  <key>ProgramArguments</key><array><string>/Users/YOU/.local/bin/uv</string><string>run</string><string>hub</string><string>worker</string></array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/Users/YOU/Private/data/logs/worker.log</string>
+  <key>StandardErrorPath</key><string>/Users/YOU/Private/data/logs/worker.log</string>
+</dict></plist>
