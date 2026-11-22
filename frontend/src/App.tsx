@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { api, setUnauthorizedHandler } from "./lib/api";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { ApiError, api, setUnauthorizedHandler } from "./lib/api";
 import type { User } from "./lib/types";
 import { Layout } from "./components/Layout";
 import { ArticleEditor, ArticleView, Community } from "./pages/Community";
+import { Devices, Pair } from "./pages/Devices";
 import { Feed } from "./pages/Feed";
 import { Home } from "./pages/Home";
 import { ItemDetail } from "./pages/ItemDetail";
@@ -14,19 +15,58 @@ import { Radar } from "./pages/Radar";
 import { Search } from "./pages/Search";
 import { Sources } from "./pages/Sources";
 
+// Display info only (no token, no email) so the installed app can open offline and show saved pages.
+// Authorization is always enforced by the server; a revoked device gets 401 as soon as it is back online.
+const REMEMBER_KEY = "hub.user";
+function remembered(): User | null {
+  try {
+    return JSON.parse(localStorage.getItem(REMEMBER_KEY) ?? "null") as User | null;
+  } catch {
+    return null;
+  }
+}
+function remember(u: User | null) {
+  if (u) localStorage.setItem(REMEMBER_KEY, JSON.stringify({ id: u.id, handle: u.handle, display_name: u.display_name, role: u.role, email: "" }));
+  else localStorage.removeItem(REMEMBER_KEY);
+}
+
 export default function App() {
-  const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [user, setUserState] = useState<User | null | undefined>(undefined);
+  const setUser = (u: User | null) => {
+    remember(u);
+    setUserState(u);
+  };
   useEffect(() => {
-    setUnauthorizedHandler(() => setUser(null));
+    setUnauthorizedHandler(() => {
+      remember(null);
+      setUserState(null);
+    });
     api<{ user: User }>("/api/auth/me")
-      .then((r) => setUser(r.user))
-      .catch(() => setUser(null));
+      .then((r) => {
+        remember(r.user);
+        setUserState(r.user);
+      })
+      .catch((e: unknown) => {
+        // Network failure (offline / hub asleep): keep using the app with on-device data.
+        const offline = e instanceof ApiError && (e.status === 0 || e.status === 503);
+        if (!offline) remember(null);
+        setUserState(offline ? remembered() : null);
+      });
   }, []);
   if (user === undefined) return <p className="p-6 text-slate-500">Loading…</p>;
-  if (user === null) return <Login onLogin={setUser} />;
+  if (user === null)
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route path="pair" element={<Pair onPaired={setUser} />} />
+          <Route path="*" element={<Login onLogin={setUser} />} />
+        </Routes>
+      </BrowserRouter>
+    );
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="pair" element={<Navigate to="/" replace />} />
         <Route element={<Layout user={user} onLogout={() => setUser(null)} />}>
           <Route index element={<Home />} />
           <Route path="radar" element={<Radar />} />
@@ -46,6 +86,7 @@ export default function App() {
           <Route path="community/new" element={<ArticleEditor />} />
           <Route path="community/edit/:id" element={<ArticleEditor />} />
           <Route path="community/:slug" element={<ArticleView />} />
+          <Route path="devices" element={<Devices />} />
           <Route path="*" element={<p>Not found.</p>} />
         </Route>
       </Routes>

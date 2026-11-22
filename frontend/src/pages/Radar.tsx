@@ -66,19 +66,19 @@ export function Radar() {
         </span>
         <span className="text-sm text-slate-500">last discovery {relativeTime(data?.last_discovery_at)}</span>
       </div>
-      <div className="mb-2 flex flex-wrap items-center gap-2" role="tablist">
+      <div className="-mx-3 mb-2 flex items-center gap-2 overflow-x-auto px-3 pb-1 md:mx-0 md:flex-wrap md:px-0" role="tablist">
         {WINDOWS.map(([k, label]) => (
           <button
             key={k}
             role="tab"
             aria-selected={win === k}
             onClick={() => setWin(k)}
-            className={`rounded-full border px-3 py-1 text-sm ${win === k ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900" : "border-slate-300 dark:border-slate-700"}`}
+            className={`shrink-0 rounded-full border px-3 py-1.5 text-sm ${win === k ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900" : "border-slate-300 dark:border-slate-700"}`}
           >
             {label} <span className="tabular-nums opacity-75">{data?.counts?.[k] ?? "…"}</span>
           </button>
         ))}
-        <label className="ml-auto flex items-center gap-1 text-sm">
+        <label className="ml-auto flex shrink-0 items-center gap-1 text-sm">
           time basis
           <select value={basis} onChange={(e) => setBasis(e.target.value)} className="rounded border border-slate-300 bg-white px-1 py-0.5 dark:border-slate-700 dark:bg-slate-900">
             <option value="discovered">discovered by hub</option>

@@ -98,6 +98,18 @@ Source and terms audit is in [SOURCES.md](SOURCES.md); environment assessment is
 | Security review of current code | done in-session (see SECURITY.md); an external review is recommended before any public deployment |
 | Public deployment | **not started by design**: requires explicit owner approval |
 
+## Phone app (added 2026-11-22)
+
+| Feature | Status |
+|---|---|
+| Installable PWA (manifest, icons, service worker, offline reading) | complete (emulated-device verification; needs https on the phone) |
+| Phone layout (bottom tabs, More sheet, collapsible filters, no horizontal overflow) | complete |
+| Phone access modes (`local` default, `lan`, `tailnet`) with client-IP allowlist and optional TLS | complete (tests + live LAN/https run) |
+| QR pairing, device sessions, revoke / log out others, per-IP rate limits | complete |
+| Native App Store / Play Store apps | **blocked**: publishing fees violate zero-cost (see MOBILE.md) |
+| Android APK wrapper | not started (no Android SDK in build env; optional) |
+| Web Push while closed | **blocked pending owner approval**: third-party push services, terms unverified |
+
 ## Next steps (proposed)
 
 1. Owner: run `make doctor`, pick a model size, then review and enable the official lab feeds you want.

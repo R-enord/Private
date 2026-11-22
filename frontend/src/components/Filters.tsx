@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useApi } from "../lib/api";
 
 export interface FilterState {
@@ -39,8 +40,14 @@ export function Filters({ value, onChange }: { value: FilterState; onChange: (f:
   const { data: cats } = useApi<{ slug: string; name: string; count: number }[]>("/api/categories");
   const set = (k: keyof FilterState) => (v: string) => onChange({ ...value, [k]: v });
   const entries = (o?: Record<string, number>) => Object.entries(o ?? {}).map(([k, n]) => [k, `${k} (${n})`] as [string, string]);
+  const [open, setOpen] = useState(false);
+  const active = Object.values(value).filter(Boolean).length;
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-900">
+    <>
+    <button onClick={() => setOpen(!open)} aria-expanded={open} className="mb-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-sm dark:border-slate-800 dark:bg-slate-900 md:hidden">
+      Filters{active ? ` (${active} active)` : ""} {open ? "▴" : "▾"}
+    </button>
+    <div className={`${open ? "flex" : "hidden"} flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-900 md:flex`}>
       <Select label="Category" value={value.category} onChange={set("category")} options={(cats ?? []).map((c) => [c.slug, `${c.name} (${c.count})`])} />
       <Select label="Type" value={value.kind} onChange={set("kind")} options={entries(facets?.kinds)} />
       <Select label="Label" value={value.label} onChange={set("label")} options={entries(facets?.labels)} />
@@ -52,5 +59,6 @@ export function Filters({ value, onChange }: { value: FilterState; onChange: (f:
         </button>
       )}
     </div>
+    </>
   );
 }

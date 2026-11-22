@@ -62,6 +62,14 @@ docker compose --profile ai up -d          # api + worker + db + local Ollama (O
 Every port is published on `127.0.0.1` only. The Dockerfile and compose file were validated
 (`docker compose config`) but not built here: the build environment had no Docker daemon.
 
+## Phone app
+
+The hub installs on your phone as a **PWA** (Progressive Web App). Android uses "Install app"; iPhone uses Safari
+Share → "Add to Home Screen". It provides a phone layout, offline reading and QR pairing with no password typed
+on the phone. Phone access is **off by default**: set `HUB_NETWORK_MODE=lan` (same Wi-Fi) or use Tailscale. See
+**[MOBILE.md](MOBILE.md)** for setup, security, and what is not possible (app stores, closed-app push
+notifications) and why.
+
 ## Commands
 
 | Command | Purpose |
@@ -87,7 +95,7 @@ Every port is published on `127.0.0.1` only. The Dockerfile and compose file wer
 
 ## Documentation
 
-[ARCHITECTURE](ARCHITECTURE.md) · [ROADMAP](ROADMAP.md) · [SOURCES](SOURCES.md) · [API_INTEGRATIONS](API_INTEGRATIONS.md) ·
+[MOBILE](MOBILE.md) · [ARCHITECTURE](ARCHITECTURE.md) · [ROADMAP](ROADMAP.md) · [SOURCES](SOURCES.md) · [API_INTEGRATIONS](API_INTEGRATIONS.md) ·
 [ENVIRONMENT](ENVIRONMENT.md) · [DATABASE](DATABASE.md) · [SECURITY](SECURITY.md) · [DEVELOPMENT_LOG](DEVELOPMENT_LOG.md)
 
 ## Repository layout

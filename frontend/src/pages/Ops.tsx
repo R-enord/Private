@@ -76,7 +76,7 @@ export function Ops() {
             </ul>
           </Card>
           <SectionTitle>Workers & scheduler</SectionTitle>
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full min-w-[28rem] text-sm">
             <tbody>
               {o.workers.slice(0, 6).map((w) => (
                 <tr key={w.worker_id} className="border-t border-slate-200 dark:border-slate-800">
@@ -87,9 +87,9 @@ export function Ops() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
           <SectionTitle>Queue by job type</SectionTitle>
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full min-w-[28rem] text-sm">
             <thead className="text-xs text-slate-500"><tr><th className="text-left">Type</th><th>queued</th><th>running</th><th>succeeded</th><th>dead</th><th></th></tr></thead>
             <tbody>
               {queueRows.map(([t, c]) => (
@@ -103,7 +103,7 @@ export function Ops() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
           <SectionTitle>Recent job problems</SectionTitle>
           <ul className="text-xs">
             {o.recent_failures.slice(0, 10).map((f) => (
@@ -131,7 +131,7 @@ export function Ops() {
           ))}
           <p className="text-xs text-slate-500">Items awaiting a summary: {o.ai.items_pending_summary} · usage 24 h: {Object.entries(o.ai.usage_24h).map(([k, v]) => `${k}=${v}`).join(", ") || "none"}</p>
           <SectionTitle>Outbound requests (24 h)</SectionTitle>
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full min-w-[28rem] text-sm">
             <thead className="text-xs text-slate-500"><tr><th className="text-left">Host</th><th>req</th><th>304</th><th>retries</th><th>errors</th><th>rate-limited</th><th>blocked</th><th>avg ms</th></tr></thead>
             <tbody>
               {o.http_24h.map((h) => (
@@ -140,7 +140,7 @@ export function Ops() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
           <SectionTitle>Duplicate review ({o.duplicates_open})</SectionTitle>
           {(dupes ?? []).slice(0, 10).map((d) => (
             <Card key={d.id} className="mb-2 !p-2 text-xs">

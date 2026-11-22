@@ -31,7 +31,12 @@ def test_backup_and_restore_roundtrip(db, tmp_path, monkeypatch) -> None:
         eng = create_engine(url)
         with eng.connect() as c:
             assert c.execute(select(func.count()).select_from(Item.__table__).where(Item.title == "Backup canary item")).scalar() == 1
-            assert c.execute(text("SELECT version_num FROM alembic_version")).scalar() == "0002"
+            from alembic.script import ScriptDirectory
+
+            from tests.conftest import alembic_config
+
+            head = ScriptDirectory.from_config(alembic_config()).get_current_head()
+            assert c.execute(text("SELECT version_num FROM alembic_version")).scalar() == head
         eng.dispose()
         with admin.connect() as c:
             c.execute(text("DROP DATABASE hub_test_restore"))

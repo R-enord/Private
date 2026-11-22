@@ -67,6 +67,10 @@ likewise.
 | `WORKER_CONCURRENCY`, `AI_MAX_CONCURRENCY`, `AI_NUM_CTX`, `LOW_RESOURCE_MODE` | `2`, `1`, `4096`, `false` | resource controls |
 | `MAX_ITEMS_PER_RUN`, `HTTP_LOG_RETENTION_DAYS`, `SESSION_DAYS` | `200`, `14`, `14` | |
 | `USER_AGENT` | generic, no personal data | sent to public APIs |
+| `NETWORK_MODE` | `local` | `local` (this computer only), `lan` (same Wi-Fi; private IPs only), `tailnet` (Tailscale IPs). See MOBILE.md |
+| `EXTRA_HOSTS`, `ALLOWED_CLIENT_NETWORKS` | `[]`, `[]` | extra Host names (e.g. `pc.tailnet.ts.net`), extra client CIDRs |
+| `TLS_CERT_FILE`, `TLS_KEY_FILE` | empty | serve https directly (needed for PWA install/offline over LAN) |
+| `DEVICE_SESSION_DAYS`, `RATE_LIMIT_AUTH_PER_MIN`, `RATE_LIMIT_API_PER_MIN` | `30`, `10`, `600` | phone sessions and per-IP limits |
 
 Runtime settings (AI on/off, embeddings, backfill batch, report hour, ranking weights, low-resource mode,
 pauses) are edited in the UI and stored in the `settings` table with an audit trail.

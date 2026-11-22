@@ -19,7 +19,7 @@ export function Login({ onLogin }: { onLogin: (u: User) => void }) {
     }
   };
   return (
-    <div className="mx-auto mt-24 max-w-sm">
+    <div className="mx-auto mt-16 max-w-sm px-4 md:mt-24">
       <h1 className="mb-1 text-2xl font-bold">AI Intelligence Hub</h1>
       <p className="mb-4 text-sm text-slate-500">Private, local-only installation. Registration is disabled.</p>
       {status && !status.has_owner && (
@@ -43,6 +43,9 @@ export function Login({ onLogin }: { onLogin: (u: User) => void }) {
           </Button>
         </form>
       </Card>
+      <p className="mt-3 text-center text-sm">
+        On a phone? <a className="text-blue-700 underline dark:text-blue-400" href="/pair">Connect with a pairing code</a>
+      </p>
     </div>
   );
 }

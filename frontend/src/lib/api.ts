@@ -1,5 +1,6 @@
 // Same-origin API client. State-changing requests carry X-Hub-Request (CSRF guard enforced server-side).
 import { useCallback, useEffect, useState } from "react";
+import { setOffline } from "./pwa";
 
 export class ApiError extends Error {
   status: number;
@@ -23,7 +24,15 @@ export async function api<T>(path: string, init: RequestInit & { json?: unknown 
     headers["Content-Type"] = "application/json";
     body = JSON.stringify(init.json);
   }
-  const res = await fetch(path, { ...init, method, body, headers, credentials: "same-origin" });
+  let res: Response;
+  try {
+    res = await fetch(path, { ...init, method, body, headers, credentials: "same-origin" });
+  } catch {
+    setOffline(true);
+    throw new ApiError(0, "Cannot reach the hub (offline or computer asleep).");
+  }
+  // The service worker marks answers served from the on-device cache.
+  setOffline(res.headers.get("x-hub-offline") === "1");
   if (res.status === 401 && !path.startsWith("/api/auth/")) onUnauthorized?.();
   if (!res.ok) {
     let detail = res.statusText;

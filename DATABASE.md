@@ -9,6 +9,7 @@ PostgreSQL ≥ 15 (developed on 16.15). Schema is defined in `backend/hub/models
 |---|---|
 | `0001` | Initial schema (39 tables) plus `CREATE EXTENSION IF NOT EXISTS pg_trgm` |
 | `0002` | `uq_report_period` becomes `UNIQUE NULLS NOT DISTINCT` (global reports have `owner_id NULL`) |
+| `0003` | Device sessions (`device_name`, `created_via`, `client_ip`) and `pairing_codes` (hashed, one-time) for the phone app |
 
 Commands: `hub migrate` (upgrade head, then seed the registry and categories), or
 `cd backend && uv run alembic upgrade head | downgrade -1 | history`. Every test run builds `hub_test` from

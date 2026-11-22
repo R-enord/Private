@@ -16,6 +16,18 @@
 | Supply chain | Locked dependencies (`uv.lock`, `pnpm-lock.yaml`). pnpm v10 blocks install scripts by default. No auto-updates. |
 | "Popular = safe" | Stars and likes are not treated as proof of security or quality; adoption is discounted for inorganic-looking patterns and every score is explained. |
 
+## Phone access (lan / tailnet modes)
+
+Off by default. When enabled:
+- Only private (RFC 1918, link-local, ULA) or Tailscale client addresses are accepted, and public IPs get 403.
+- Pairing codes are one-time, short-lived and hashed.
+- Login and pairing are rate-limited per IP.
+- Each device has its own revocable session.
+- The service worker never caches auth, pairing, device or stream responses, and cached data is wiped on logout.
+
+Details are in MOBILE.md. Over plain http on a LAN, traffic is unencrypted on your Wi-Fi; prefer https via
+mkcert or Tailscale.
+
 ## Secrets
 
 - Put secrets in `.env` (git-ignored) or the process environment. Never commit them, paste them into issues or

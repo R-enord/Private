@@ -77,8 +77,15 @@ def cmd_serve(args: argparse.Namespace) -> int:
 
     s = get_settings()
     s.check_exposure()
+    if s.network_mode != "local":
+        from hub.net.lanaddr import phone_urls
+
+        print(f"phone access ({s.network_mode} mode): " + ", ".join(phone_urls(s.network_mode, s.extra_hosts, s.scheme,
+                                                                                args.port or s.port)))
     uvicorn.run("hub.api.app:create_app", factory=True, host=s.bind_host, port=args.port or s.port,
-                log_level="info", proxy_headers=False, server_header=False)
+                log_level="info", proxy_headers=False, server_header=False,
+                ssl_certfile=str(s.tls_cert_file) if s.tls_cert_file else None,
+                ssl_keyfile=str(s.tls_key_file) if s.tls_key_file else None)
     return 0
 
 

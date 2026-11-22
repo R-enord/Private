@@ -171,3 +171,51 @@ frontend: pnpm typecheck / pnpm lint    → ok / ok
 
 **Next:** owner runs `make doctor` on the real machine and reviews and enables lab feeds; optional GitHub
 token; then Phase 3 source audits (Reddit, Product Hunt, GitLab, Codeberg).
+
+## 2026-11-22 — phone app (PWA) increment
+
+**Built**
+- Backend:
+  - `HUB_NETWORK_MODE` (`local` default, `lan`, `tailnet`) with a client-IP allowlist middleware (explicit
+    RFC 1918 / link-local / ULA, or Tailscale ranges; public IPs refused).
+  - Automatic Host allowlist for the machine's own IPs and configured names.
+  - Optional TLS (`HUB_TLS_CERT_FILE` and `HUB_TLS_KEY_FILE`).
+  - Per-IP rate limits.
+  - QR pairing (one-time hashed codes, 10 min, single use).
+  - Device sessions with list, revoke and revoke-others.
+  - Migration 0003.
+- Frontend:
+  - Manifest, icons and service worker (shell cache-first, API network-first with an offline marker; auth,
+    devices and stream never cached; wipe on logout).
+  - Phone layout with bottom tabs, More sheet and collapsible filters.
+  - Devices page with QR code; `/pair` page.
+  - Offline-capable startup.
+
+**Verified** (Playwright, live server in `lan` mode on 0.0.0.0:8000, phone over the LAN address `http://192.0.2.2:8000`):
+
+| Check | Result |
+|---|---|
+| Desktop creates a code and shows QR + LAN URL | ok |
+| Emulated iPhone 15 opens `/pair?code=…`, device name prefilled "iPhone", connects | ok |
+| Phone layout: horizontal overflow on home, item, search, ops, sources, opportunities, settings, devices | 0 px on every page; bottom nav visible; desktop nav hidden |
+| Desktop lists the paired iPhone, then revokes it | phone falls back to login |
+| Emulated Pixel 7 (secure context): service worker | `activated`, controlling the page |
+| Manifest | standalone, 192/512/maskable icons |
+| Offline (context offline): home and previously opened item page | both render, with the offline banner |
+| https | `HUB_TLS_*` with a self-signed cert: `/api/health` and the manifest served over https on :8443 |
+| Backend tests | `uv run pytest -q` → **155 passed** (incl. 24 new device/pairing/network tests); ruff and mypy clean |
+| Frontend | typecheck, lint, 5 unit tests and build pass |
+
+**Fixed during verification**
+- LAN mode used `ipaddress.is_private`, which also admits documentation ranges such as 203.0.113.0/24 →
+  replaced with an explicit network list (test caught it).
+- Offline, the app treated "hub unreachable" as "logged out" → it now remembers display-only user info and
+  opens with saved data.
+- Two test-time issues:
+  - a rate-limit test used a fixed past timestamp, so it failed once the real clock passed it;
+  - the backup test hard-coded the migration head.
+- Two races in the Playwright script, which navigated before the revoke response and counted the device list
+  before it loaded.
+
+**Not done** (see MOBILE.md): store-distributed native apps (fees), Android APK wrapper (no SDK here), closed-app
+push (third-party push services, unverified terms), real-device testing.

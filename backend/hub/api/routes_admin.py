@@ -70,7 +70,7 @@ def login(body: LoginBody, request: Request, response: Response, db: Session = D
     if not ok or user is None:
         db.commit()
         raise HTTPException(401, "invalid email or password")
-    token = create_session(db, user, request.headers.get("user-agent", ""))
+    token = create_session(db, user, request.headers.get("user-agent", ""), client_ip=client)
     audit(db, "auth.login", user_id=user.id, target_type="user", target_id=user.id, client=client)
     db.commit()
     response.set_cookie(COOKIE_NAME, token, httponly=True, samesite="strict", secure=request.url.scheme == "https",

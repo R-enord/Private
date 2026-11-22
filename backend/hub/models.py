@@ -72,7 +72,25 @@ class UserSession(Base):
     last_seen_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
     user_agent: Mapped[str] = mapped_column(String(300), nullable=False, default="")
     revoked: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    device_name: Mapped[str] = mapped_column(String(100), nullable=False, default="", server_default="")
+    created_via: Mapped[str] = mapped_column(String(20), nullable=False, default="password", server_default="password")
+    client_ip: Mapped[str] = mapped_column(String(64), nullable=False, default="", server_default="")
     user: Mapped[User] = relationship()
+
+
+class PairingCode(Base):
+    """One-time, short-lived code that lets a phone obtain its own session (QR pairing). Only the hash is stored."""
+
+    __tablename__ = "pairing_codes"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    code_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    created_at: Mapped[dt.datetime] = _now_col()
+    expires_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    used_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
+    used_session_id: Mapped[int | None] = mapped_column(ForeignKey("user_sessions.id", ondelete="SET NULL"))
+    created_ip: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    used_ip: Mapped[str] = mapped_column(String(64), nullable=False, default="")
 
 
 class LoginAttempt(Base):

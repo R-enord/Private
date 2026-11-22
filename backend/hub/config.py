@@ -35,6 +35,17 @@ class Settings(BaseSettings):
     # Registration stays disabled until the owner explicitly approves public access.
     registration_enabled: bool = False
     public_access_approved: bool = False
+    # Phone access (off by default). "local": loopback clients only. "lan": also clients on private networks
+    # (home Wi-Fi). "tailnet": also Tailscale addresses (100.64.0.0/10, fd7a:115c:a1e0::/48). Public IPs are
+    # always refused unless HUB_PUBLIC_ACCESS_APPROVED=true.
+    network_mode: str = "local"
+    extra_hosts: list[str] = Field(default_factory=list)  # e.g. ["mybox.local", "mybox.tail1234.ts.net"]
+    allowed_client_networks: list[str] = Field(default_factory=list)  # extra CIDRs for unusual LAN ranges
+    tls_cert_file: Path | None = None  # optional HTTPS (needed for installable PWA over LAN)
+    tls_key_file: Path | None = None
+    device_session_days: int = 30
+    rate_limit_auth_per_min: int = 10
+    rate_limit_api_per_min: int = 600
 
     # --- Cost & privacy invariants ---
     zero_cost_mode: bool = True
@@ -88,6 +99,14 @@ class Settings(BaseSettings):
             )
         return v
 
+    @field_validator("network_mode")
+    @classmethod
+    def _valid_mode(cls, v: str) -> str:
+        v = v.strip().lower()
+        if v not in {"local", "lan", "tailnet"}:
+            raise ValueError("HUB_NETWORK_MODE must be local, lan or tailnet")
+        return v
+
     @field_validator("bind_host")
     @classmethod
     def _bind_local(cls, v: str) -> str:
@@ -96,13 +115,25 @@ class Settings(BaseSettings):
         return v.strip()
 
     def check_exposure(self) -> None:
-        """Refuse to expose the instance or enable registration without explicit approval."""
+        """Refuse to expose the instance or enable registration without explicit approval.
+
+        A non-loopback bind is allowed without public approval only in lan/tailnet mode, where the client-IP
+        allowlist middleware rejects every non-private address.
+        """
         loopback = self.bind_host in {"127.0.0.1", "localhost", "::1"}
-        if (not loopback or self.registration_enabled) and not self.public_access_approved:
+        if self.registration_enabled and not self.public_access_approved:
+            raise RuntimeError("Refusing to start: registration requires HUB_PUBLIC_ACCESS_APPROVED=true (SECURITY.md).")
+        if not loopback and self.network_mode == "local" and not self.public_access_approved:
             raise RuntimeError(
-                "Refusing to start: non-loopback bind or registration requires "
-                "HUB_PUBLIC_ACCESS_APPROVED=true (see SECURITY.md 'Before any public deployment')."
+                "Refusing to start: a non-loopback bind needs HUB_NETWORK_MODE=lan|tailnet (private networks only) "
+                "or HUB_PUBLIC_ACCESS_APPROVED=true (see SECURITY.md 'Before any public deployment')."
             )
+        if bool(self.tls_cert_file) != bool(self.tls_key_file):
+            raise RuntimeError("Set both HUB_TLS_CERT_FILE and HUB_TLS_KEY_FILE, or neither.")
+
+    @property
+    def scheme(self) -> str:
+        return "https" if self.tls_cert_file and self.tls_key_file else "http"
 
     @property
     def is_test(self) -> bool:

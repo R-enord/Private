@@ -65,13 +65,22 @@ def _token_hash(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
 
-def create_session(session: Session, user: User, user_agent: str = "") -> str:
+def create_session(session: Session, user: User, user_agent: str = "", *, device_name: str = "",
+                   created_via: str = "password", client_ip: str = "", days: int | None = None) -> str:
     token = secrets.token_urlsafe(32)
     now = dt.datetime.now(dt.UTC)
     session.add(UserSession(user_id=user.id, token_hash=_token_hash(token), created_at=now, last_seen_at=now,
-                            expires_at=now + dt.timedelta(days=get_settings().session_days), user_agent=user_agent[:300]))
+                            expires_at=now + dt.timedelta(days=days or get_settings().session_days),
+                            user_agent=user_agent[:300], device_name=device_name[:100], created_via=created_via,
+                            client_ip=client_ip[:64]))
     user.last_login_at = now
     return token
+
+
+def session_id_for_token(session: Session, token: str | None) -> int | None:
+    if not token:
+        return None
+    return session.scalar(select(UserSession.id).where(UserSession.token_hash == _token_hash(token)))
 
 
 def user_from_token(session: Session, token: str | None) -> User | None:

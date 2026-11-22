@@ -263,7 +263,7 @@ def test_failure_backoff_and_health(db) -> None:
 
 
 def test_rate_limit_defers_source(db) -> None:
-    reset = int((NOW + dt.timedelta(minutes=40)).timestamp())
+    reset = int((dt.datetime.now(dt.UTC) + dt.timedelta(minutes=40)).timestamp())  # header is absolute wall time
     t = httpx.MockTransport(lambda r: httpx.Response(
         403, headers={"x-ratelimit-remaining": "0", "x-ratelimit-reset": str(reset)}, json={"message": "API rate limit exceeded"}))
     r = run("github-new-ai-repos", transport=t)

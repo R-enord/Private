@@ -29,3 +29,14 @@ describe("format helpers", () => {
     expect(qs({})).toBe("");
   });
 });
+
+import { guessDeviceName } from "./pwa";
+
+describe("device names", () => {
+  it("guesses a friendly name from the user agent", () => {
+    expect(guessDeviceName("Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)")).toBe("iPhone");
+    expect(guessDeviceName("Mozilla/5.0 (Linux; Android 15; Pixel 9 Build/AP3A)")).toBe("Pixel 9");
+    expect(guessDeviceName("Mozilla/5.0 (Linux; Android 14; SM-S921B)")).toBe("SM-S921B");
+    expect(guessDeviceName("curl/8")).toBe("Phone");
+  });
+});
