@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+ <channel>
+  <atom:link href="https://huggingface.co/blog/feed.xml" rel="self" type="application/rss+xml"/>
+  <title>Hugging Face - Blog</title>
+  <link>https://huggingface.co/blog</link>
+  <description>The Hugging Face blog</description>
+  <language>en-US</language>
+  <item>
+   <title>Welcome Inkling 2 Mini, Cutting-edge Performance for your Local Setup</title>
+   <pubDate>Fri, 20 Nov 2026 00:00:00 GMT</pubDate>
+   <link>https://huggingface.co/blog/inkling2mini</link>
+   <guid isPermaLink="true">https://huggingface.co/blog/inkling2mini</guid>
+  </item>
+  <item>
+   <title>Introducing harness adapters: adapt your favorite model to your harness to improve performance and cost</title>
+   <pubDate>Fri, 20 Nov 2026 00:00:00 GMT</pubDate>
+   <link>https://huggingface.co/blog/harness-adapters-at-scale</link>
+   <guid isPermaLink="true">https://huggingface.co/blog/harness-adapters-at-scale</guid>
+  </item>
+  <item>
+   <title>DaisyRose-27B: Pushing the Frontier of Post-Training Efficiency</title>
+   <pubDate>Wed, 18 Nov 2026 19:54:56 GMT</pubDate>
+   <link>https://huggingface.co/blog/RadixArk/daisyrose-27b-pushing-the-frontier-of-post-trainin</link>
+   <guid isPermaLink="false">https://huggingface.co/blog/RadixArk/daisyrose-27b-pushing-the-frontier-of-post-trainin</guid>
+  </item>
+ </channel>
+</rss>

@@ -1,0 +1,26 @@
+[
+  {
+    "id": 900000001,
+    "tag_name": "v0.40.17",
+    "name": "v0.40.17",
+    "html_url": "https://github.com/example-org/example-llm-runtime/releases/tag/v0.40.17",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2026-11-20T18:00:00Z",
+    "published_at": "2026-11-20T18:05:00Z",
+    "author": {"login": "release-bot"},
+    "body": "## What's Changed\n* Faster model loading on CPU\n* Fix memory leak in embeddings\n\n**Full Changelog**: v0.40.16...v0.40.17"
+  },
+  {
+    "id": 900000002,
+    "tag_name": "v0.41.0-rc1",
+    "name": "v0.41.0 Release Candidate 1",
+    "html_url": "https://github.com/example-org/example-llm-runtime/releases/tag/v0.41.0-rc1",
+    "draft": false,
+    "prerelease": true,
+    "created_at": "2026-11-21T10:00:00Z",
+    "published_at": "2026-11-21T10:01:00Z",
+    "author": {"login": "release-bot"},
+    "body": "Preview build. Deprecated: the legacy /api/embeddings endpoint will be removed."
+  }
+]

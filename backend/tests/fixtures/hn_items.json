@@ -1,0 +1,304 @@
+{
+ "50596664": {
+  "by": "tamnd",
+  "descendants": 24,
+  "id": 50596664,
+  "score": 55,
+  "time": 1795326390,
+  "title": "Show HN: The Riemann Proof Handbook",
+  "type": "story",
+  "url": "https://github.com/tamnd/riemann-handbook"
+ },
+ "50593737": {
+  "by": "raphlinus",
+  "descendants": 75,
+  "id": 50593737,
+  "score": 177,
+  "time": 1795295873,
+  "title": "Advice for the next 100 Rust GUIs",
+  "type": "story",
+  "url": "https://linebender.org/blog/next-100-guis/"
+ },
+ "50591853": {
+  "by": "k__",
+  "descendants": 119,
+  "id": 50591853,
+  "score": 477,
+  "time": 1795284139,
+  "title": "Inkling-2-Mini in 5.4 GB Memory",
+  "type": "story",
+  "url": "https://github.com/ShinMegamiBoson/lookatmyquant"
+ },
+ "50593481": {
+  "by": "vasie",
+  "descendants": 23,
+  "id": 50593481,
+  "score": 100,
+  "time": 1795294061,
+  "title": "Pandex \u2013 Official European Law for AI Agents, over MCP",
+  "type": "story",
+  "url": "https://www.pandex.io"
+ },
+ "50592097": {
+  "by": "f311a",
+  "descendants": 61,
+  "id": 50592097,
+  "score": 125,
+  "time": 1795285769,
+  "title": "Upload2Shell (CVE-2026-125396)",
+  "type": "story",
+  "url": "https://pwn.ai/upload2shell"
+ },
+ "50587875": {
+  "by": "soheilpro",
+  "descendants": 277,
+  "id": 50587875,
+  "score": 595,
+  "time": 1795257392,
+  "title": "My monitor was cutting my download speed by 75%",
+  "type": "story",
+  "url": "https://blog.tymscar.com/posts/studiodisplayethernet/"
+ },
+ "50596133": {
+  "by": "zdw",
+  "descendants": 346,
+  "id": 50596133,
+  "score": 560,
+  "time": 1795320296,
+  "title": "Toyota, Nissan, and Honda to standardize parts to lower costs",
+  "type": "story",
+  "url": "https://www.caranddriver.com/news/a74490092/toyota-nissan-honda-standardize-parts-lower-costs/"
+ },
+ "50594911": {
+  "by": "subdomain",
+  "descendants": 95,
+  "id": 50594911,
+  "score": 288,
+  "time": 1795306079,
+  "title": "Sandwich Simulator",
+  "type": "story",
+  "url": "https://stulle.app/"
+ },
+ "50591260": {
+  "by": "valyala",
+  "descendants": 25,
+  "id": 50591260,
+  "score": 154,
+  "time": 1795280884,
+  "title": "PostgreSQL Extensions in Go",
+  "type": "story",
+  "url": "https://jespino.github.io/gopgext/"
+ },
+ "50579568": {
+  "by": "jasondavies",
+  "descendants": 1178,
+  "id": 50579568,
+  "score": 2424,
+  "text": "Related: <i>Levent Alp\u00f6ge claims proof of the Generalized Riemann Hypothesis [pdf]</i> - <a href=\"https:&#x2F;&#x2F;news.ycombinator.com&#x2F;item?id=50574968\">https:&#x2F;&#x2F;news.ycombinator.com&#x2F;item?id=50574968</a>",
+  "time": 1795199594,
+  "title": "Hurried Announcement: Alessandro Masullo GRH",
+  "type": "story",
+  "url": "https://math216.wordpress.com/2026/11/20/hurried-announcement-alessandro-masullo-grh/"
+ },
+ "50597743": {
+  "by": "rzk",
+  "descendants": 2,
+  "id": 50597743,
+  "score": 15,
+  "time": 1795339116,
+  "title": "Harsher on Male? Evaluating LLMs on Gender-Asymmetric Moral Framing in Conflicts",
+  "type": "story",
+  "url": "https://arxiv.org/abs/2606.14068"
+ },
+ "50595554": {
+  "by": "sdko",
+  "descendants": 66,
+  "id": 50595554,
+  "score": 167,
+  "time": 1795313654,
+  "title": "Data Processing Incidents on Inference Providers",
+  "type": "story",
+  "url": "https://openrouter.ai/blog/announcements/data-processing-incidents-on-inference-providers/"
+ },
+ "50589618": {
+  "by": "g-b-r",
+  "descendants": 878,
+  "id": 50589618,
+  "score": 1055,
+  "time": 1795271805,
+  "title": "Lean verification of the Riemann Hypothesis",
+  "type": "story",
+  "url": "https://leanprover-community.github.io/blog/posts/riemann-hypothesis/"
+ },
+ "50582069": {
+  "by": "rafaelc",
+  "descendants": 224,
+  "id": 50582069,
+  "score": 1049,
+  "time": 1795208592,
+  "title": "Pill to treat pancreatic cancer hailed as 'biggest breakthrough in decades'",
+  "type": "story",
+  "url": "https://www.theguardian.com/society/2026/nov/20/pill-pancreatic-cancer-breakthrough-daraxonrasib"
+ },
+ "50587208": {
+  "by": "gdgghhhhh",
+  "descendants": 106,
+  "id": 50587208,
+  "score": 257,
+  "time": 1795249978,
+  "title": "GnuPG Security Advisory for GPGME",
+  "type": "story",
+  "url": "https://lists.gnupg.org/pipermail/gnupg-announce/2026q4/000517.html"
+ },
+ "50554572": {
+  "by": "todsacerdoti",
+  "descendants": 0,
+  "id": 50554572,
+  "score": 13,
+  "time": 1795049405,
+  "title": "Reversing the Next-Page Prefetcher in Skylake-X",
+  "type": "story",
+  "url": "https://devsh0.github.io/microarchitecture,/intel,/computer-architecture/2026/11/17/reversing-the-next-page-prefetcher-in-skylake-x.html"
+ },
+ "50597612": {
+  "by": "happosai",
+  "descendants": 219,
+  "id": 50597612,
+  "score": 164,
+  "time": 1795337854,
+  "title": "87% of the Anthropic power will come from gas and 11% from coal in 2028",
+  "type": "story",
+  "url": "https://betterdatacenterproject.com/2026/11/16/how-ai-is-powered-a-breakdown-of-byop-and-grid-power/"
+ },
+ "50594132": {
+  "by": "sebaandrada",
+  "descendants": 18,
+  "id": 50594132,
+  "score": 123,
+  "time": 1795298998,
+  "title": "PcapAnalyzer \u2013 self-hosted pcap analyzer with 27 problem detectors",
+  "type": "story",
+  "url": "https://github.com/sebaandrada-cell/PcapAnalyzer"
+ },
+ "50559820": {
+  "by": "damezumari",
+  "descendants": 5,
+  "id": 50559820,
+  "score": 9,
+  "time": 1795094923,
+  "title": "Is 'fork' missing operation in sandboxes?",
+  "type": "story",
+  "url": "https://avrea.com/blog/avrea-sandboxes-computers-should-be-forkable"
+ },
+ "50569846": {
+  "by": "wglb",
+  "descendants": 16,
+  "id": 50569846,
+  "score": 38,
+  "time": 1795145861,
+  "title": "If tiny 'primordial' black holes exist",
+  "type": "story",
+  "url": "https://phys.org/news/2026-11-tiny-primordial-black-holes.html"
+ },
+ "50595537": {
+  "by": "Anon84",
+  "descendants": 159,
+  "id": 50595537,
+  "score": 77,
+  "time": 1795313402,
+  "title": "The Mythology of Conscious AI",
+  "type": "story",
+  "url": "https://www.noemamag.com/the-mythology-of-conscious-ai/"
+ },
+ "50566495": {
+  "by": "philips",
+  "descendants": 0,
+  "id": 50566495,
+  "score": 4,
+  "time": 1795122947,
+  "title": "Self-hosted library branch over public web OPDS",
+  "type": "story",
+  "url": "https://joinmayberry.com/"
+ },
+ "50583028": {
+  "by": "jger15",
+  "descendants": 98,
+  "id": 50583028,
+  "score": 289,
+  "time": 1795212665,
+  "title": "Getting the mind to steer the body to steer you",
+  "type": "story",
+  "url": "https://notnottalmud.substack.com/p/getting-the-mind-to-steer-the-body"
+ },
+ "50588982": {
+  "by": "beginning_end",
+  "descendants": 391,
+  "id": 50588982,
+  "score": 623,
+  "time": 1795267394,
+  "title": "Detonating a pile of lead azide",
+  "type": "story",
+  "url": "https://www.science.org/content/blog-post/detonating-huge-pile-lead-azide-really"
+ },
+ "50533945": {
+  "by": "DonAtimator",
+  "descendants": 5,
+  "id": 50533945,
+  "score": 30,
+  "time": 1794933346,
+  "title": "A real Linux kernel, compiled to WebAssembly",
+  "type": "story",
+  "url": "https://github.com/pithings/unkernel"
+ },
+ "50487155": {
+  "by": "spacedcowboy",
+  "descendants": 2,
+  "id": 50487155,
+  "score": 16,
+  "text": "I&#x27;m writing a language called xc and its compiler, xcc for the last 6 months or so (full disclosure: with a lot of help from Claude). I&#x27;ve finally got version 1 (actually v1.0.1) out, for Linux (x86-64 and arm64, including the Pi 5), macOS and Windows.<p>The idea: you write an ordinary loop, the compiler works out whether it can run in parallel, and it emits both a multi-core CPU version and GPU kernels (MSL, PTX, SPIR-V or WGSL, all generated by xcc itself without needing an SDK installed).<p>At run time the program measures each block on that machine and keeps the faster placement.<p>Examples:<p>- On an M3 Max a Mandelbrot block takes 13.7 ms on all 16 cores and 1.3 ms on the GPU<p>- On a Ryzen 9955HX&#x27;s 2-CU integrated Radeon the GPU loses to the 32 CPU threads, so it stays on the CPU.<p>The compiler also reads plain old C via clang&#x27;s front end and does the same thing to C loops, with no pragmas. Comparing xcc to OpenMP for both gcc and clang (with the helping hand of &quot;#pragma omp parallel for&quot; gives (times in ms):<p><pre><code>                 xcc    gcc+omp  clang+omp\n  mandel_deep    371    2170     2231\n  mandelbrot     2.45   12.2     12.8\n  md5            9.39   16.1     13.4\n  md5_mask       8.17   12.1     13.4\n  nbody          0.45   1.29     9.92\n  perlin         5.87   4.38     7.05\n  saxpy          2.26   2.18     2.32\n</code></pre>\nGeometric mean: xcc is 2.1x faster than GCC+OpenMP and 3.0x faster than clang+OpenMP.<p>All the builds are checked to make sure they give the same result - no point having a benchmark that doesn&#x27;t produce the same result! xcc has a notable win for nbody, because its vectorisation is better (across bodies) but perlin has been a bit of a bugbear throughout the leading-up-to-v1 timespan.<p>Platform-specific binary tarballs, the sources, OpenMP versions and method are on the site (linked from github), and there are Phoronix Test Suite profiles if you&#x27;d like to run them yourself.<p>It&#x27;s only just made v1 so there&#x27;s a few rough edges: C++ through clang is in-progress (but not official yet), and the Pi 5&#x27;s GPU is slow. Not sure if that&#x27;s the Pi or the code yet...<p>There&#x27;s more to the language but I don&#x27;t want this to be an essay! The real, honest-to-$deity cool thing is the <i>automatic</i> parallelising of standard C&#x2F;xc loops and being able to run that code on the GPU with <i>no boilerplate</i> - &quot;ARC for Algorithms&quot; (what Objective-C&#x27;s ARC did for memory management), it &quot;just works&quot;.<p>Very keen to get feedback and fix any gaps. I think it&#x27;s generally useful right now, but it is &quot;v1&quot; - Bug reports welcome as GitHub issues...",
+  "time": 1794592422,
+  "title": "Show HN: Compile the same source for GPUs and CPUs",
+  "type": "story",
+  "url": "https://github.com/ThrudTheBarbarian/xc"
+ },
+ "50596155": {
+  "by": "BaselAshraf81",
+  "descendants": 27,
+  "id": 50596155,
+  "score": 45,
+  "time": 1795320609,
+  "title": "Fast-Anything: Don't rewrite it in Rust. Rewrite the 5% that's slow",
+  "type": "story",
+  "url": "https://github.com/EL4CTEO/fast-anything"
+ },
+ "50546587": {
+  "by": "fortran77",
+  "descendants": 160,
+  "id": 50546587,
+  "score": 258,
+  "time": 1795011358,
+  "title": "LLMs can read and write executables byte by byte from a hex dump",
+  "type": "story",
+  "url": "https://sgiannopoulos.github.io/blog/machine-code-programming/"
+ },
+ "50560314": {
+  "by": "ibobev",
+  "descendants": 0,
+  "id": 50560314,
+  "score": 38,
+  "time": 1795097313,
+  "title": "Split Radiance Cascades",
+  "type": "story",
+  "url": "https://www.jacktollenaar.top/articles/split-rc.html"
+ },
+ "50596960": {
+  "by": "kouosi",
+  "descendants": 5,
+  "id": 50596960,
+  "score": 35,
+  "time": 1795330345,
+  "title": "Notes on the discrete Fourier transform (DFT)",
+  "type": "story",
+  "url": "https://eli.thegreenplace.net/2026/notes-on-the-discrete-fourier-transform-dft/"
+ }
+}
