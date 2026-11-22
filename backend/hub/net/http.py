@@ -13,6 +13,7 @@ and honour ``Retry-After``/rate-limit reset headers. Response bodies are size-ca
 
 from __future__ import annotations
 
+import contextlib
 import datetime as dt
 import email.utils
 import ipaddress
@@ -83,15 +84,11 @@ def parse_rate_headers(headers: httpx.Headers, now: dt.datetime | None = None) -
     info = RateInfo()
     # GitHub style
     if (rem := headers.get("x-ratelimit-remaining")) is not None:
-        try:
+        with contextlib.suppress(ValueError):
             info.remaining = int(rem)
-        except ValueError:
-            pass
     if (reset := headers.get("x-ratelimit-reset")) is not None:
-        try:
+        with contextlib.suppress(ValueError, OverflowError):
             info.reset_at = dt.datetime.fromtimestamp(int(reset), dt.UTC)
-        except (ValueError, OverflowError):
-            pass
     # IETF draft (Hugging Face): RateLimit: "api";r=485;t=257
     if (rl := headers.get("ratelimit")) is not None and (m := _HF_RATELIMIT_RE.search(rl)):
         info.remaining = int(m.group("r"))
@@ -139,6 +136,7 @@ class SafeHttpClient:
     max_redirects: int = 5
     max_bytes: int = 15 * 1024 * 1024
     sleep: Callable[[float], None] = time.sleep
+    use_env_proxy: bool = True  # False for loopback services (local Ollama) — never proxied
     log: list[dict[str, Any]] = field(default_factory=list)
     last_rate: RateInfo = field(default_factory=RateInfo)
     _client: httpx.Client | None = None
@@ -184,7 +182,7 @@ class SafeHttpClient:
                 transport=self.transport,
                 timeout=httpx.Timeout(self.timeout_s, connect=min(15.0, self.timeout_s)),
                 follow_redirects=False,
-                trust_env=self.transport is None,  # honour HTTPS_PROXY / CA bundle in real runs
+                trust_env=self.transport is None and self.use_env_proxy,  # HTTPS_PROXY / CA bundle in real runs
             )
         return self._client
 

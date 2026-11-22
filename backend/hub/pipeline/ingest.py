@@ -32,16 +32,17 @@ from hub.models import (
     Category,
     DedupeCandidate,
     Item,
-    ItemCategory,
     ItemKey,
     ItemSource,
     MetricSnapshot,
     Opportunity,
-    RawRecord as RawRow,
     ReleaseEvent,
     Source,
     SourceCheckpoint,
     SourceRun,
+)
+from hub.models import (
+    RawRecord as RawRow,
 )
 from hub.net.cost_guard import EgressDenied
 from hub.net.http import HttpError, RateLimited, SafeHttpClient
@@ -533,8 +534,9 @@ def run_source(source_id: int, *, job_id: int | None = None, transport: httpx.Ba
     result.warnings = ctx.warnings[:20]
     with session_scope() as s:
         src = s.get(Source, source.id)
-        run = s.get(SourceRun, run_id)
-        assert src is not None and run is not None
+        run_row = s.get(SourceRun, run_id)
+        assert src is not None and run_row is not None
+        run = run_row
         persist_http_log(s, client.log)
         run.finished_at = dt.datetime.now(dt.UTC)
         run.records_fetched, run.items_new, run.items_updated = result.records, result.new, result.updated

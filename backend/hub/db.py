@@ -44,6 +44,11 @@ def session_factory() -> sessionmaker[Session]:
     return _SessionLocal
 
 
+def rowcount(result: object) -> int:
+    """Rows affected by an UPDATE/DELETE/INSERT executed via Session.execute (CursorResult)."""
+    return int(getattr(result, "rowcount", 0) or 0)
+
+
 @contextmanager
 def session_scope() -> Iterator[Session]:
     """Transactional scope: commit on success, rollback on error."""

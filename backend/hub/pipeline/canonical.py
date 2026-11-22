@@ -128,10 +128,10 @@ def identity_keys(url: str | None, extra: list[str] | None = None) -> list[str]:
     keys: list[str] = list(extra or [])
     if url and safe_link(url):
         keys.append("url:" + canonicalize_url(url))
-        if repo := github_repo_from_url(url):
-            # Only the repository root identifies the repo; release/issue URLs are their own items.
-            if canonicalize_url(url) == f"https://github.com/{repo}":
-                keys.append(f"github:{repo}")
+        repo = github_repo_from_url(url)
+        # Only the repository root identifies the repo; release/issue URLs are their own items.
+        if repo and canonicalize_url(url) == f"https://github.com/{repo}":
+            keys.append(f"github:{repo}")
         if (aid := extract_arxiv_id(url)) is not None:
             keys.append(f"arxiv:{aid}")
         if hf := hf_repo_from_url(url):

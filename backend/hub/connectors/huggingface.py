@@ -78,7 +78,7 @@ class HuggingFaceConnector(Connector):
         if raw.external_id.startswith("hfpaper:"):
             return self._norm_paper(raw)
         p = raw.payload
-        rid = p.get("id") or p.get("modelId")
+        rid: str = str(p.get("id") or p.get("modelId") or raw.external_id.split(":", 1)[1])
         kind = raw.external_id.split(":", 1)[0]
         tags_all = [t for t in (p.get("tags") or []) if isinstance(t, str)]
         lic = next((t.split(":", 1)[1] for t in tags_all if t.startswith("license:")), "")

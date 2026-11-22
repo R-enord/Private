@@ -13,7 +13,14 @@ import datetime as dt
 from collections.abc import Iterator
 from typing import Any
 
-from hub.connectors.base import Connector, ConnectorContext, Normalized, RawRecord, markdown_to_text, parse_iso
+from hub.connectors.base import (
+    Connector,
+    ConnectorContext,
+    Normalized,
+    RawRecord,
+    markdown_to_text,
+    parse_iso,
+)
 from hub.net.http import HttpError, RateLimited
 from hub.pipeline.canonical import safe_link
 

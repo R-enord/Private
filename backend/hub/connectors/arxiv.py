@@ -24,7 +24,11 @@ _GH_IN_TEXT = re.compile(r"https?://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"
 def _ts(struct: Any) -> dt.datetime | None:
     if not struct:
         return None
-    return dt.datetime(*struct[:6], tzinfo=dt.UTC)
+    return dt.datetime(struct[0], struct[1], struct[2], struct[3], struct[4], struct[5], tzinfo=dt.UTC)
+
+
+def _iso(d: dt.datetime | None) -> str | None:
+    return d.isoformat() if d else None
 
 
 def parse_feed(content: bytes) -> list[dict[str, Any]]:
@@ -45,8 +49,8 @@ def parse_feed(content: bytes) -> list[dict[str, Any]]:
             "authors": [a.get("name", "") for a in e.get("authors", [])],
             "published": e.get("published", ""),
             "updated": e.get("updated", ""),
-            "published_ts": _ts(e.get("published_parsed")).isoformat() if e.get("published_parsed") else None,
-            "updated_ts": _ts(e.get("updated_parsed")).isoformat() if e.get("updated_parsed") else None,
+            "published_ts": _iso(_ts(e.get("published_parsed"))),
+            "updated_ts": _iso(_ts(e.get("updated_parsed"))),
             "categories": [t.get("term") for t in e.get("tags", []) if t.get("term")],
             "primary_category": (e.get("arxiv_primary_category") or {}).get("term", ""),
             "comment": e.get("arxiv_comment", ""),

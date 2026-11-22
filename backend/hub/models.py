@@ -638,7 +638,9 @@ class Report(Base):
     item_ids: Mapped[list[int]] = mapped_column(ARRAY(BigInteger), nullable=False, default=list)
     created_at: Mapped[dt.datetime] = _now_col()
 
-    __table_args__ = (UniqueConstraint("owner_id", "period", "period_start", name="uq_report_period"),)
+    # NULLS NOT DISTINCT: global reports (owner_id NULL) must also be unique per period (PostgreSQL >= 15)
+    __table_args__ = (UniqueConstraint("owner_id", "period", "period_start", name="uq_report_period",
+                                       postgresql_nulls_not_distinct=True),)
 
 
 # ---------------------------------------------------------------------------

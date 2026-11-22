@@ -20,7 +20,7 @@ from hub.pipeline.canonical import safe_link
 def _ts(struct: Any) -> str | None:
     if not struct:
         return None
-    return dt.datetime(*struct[:6], tzinfo=dt.UTC).isoformat()
+    return dt.datetime(struct[0], struct[1], struct[2], struct[3], struct[4], struct[5], tzinfo=dt.UTC).isoformat()
 
 
 class RSSConnector(Connector):
