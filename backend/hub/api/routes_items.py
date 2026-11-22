@@ -161,6 +161,7 @@ def home(user: User = Depends(require("items:read")), db: Session = Depends(get_
         "stats": stats,
         "sections": [
             {"key": "important", "title": "Important discoveries (24 h)", "items": top(select(Item).where(Item.discovered_at > day), 8)},
+            {"key": "media", "title": "Shorts & videos", "items": top(select(Item).where(Item.kind.in_(("short", "video")), Item.discovered_at > week), 4)},
             {"key": "trending_repos", "title": "Trending projects (growth, 7 d)", "items": trending_items},
             {"key": "model_releases", "title": "Model releases", "items": top(select(Item).where(Item.kind == "model", Item.discovered_at > week))},
             {"key": "mcp_agents", "title": "MCP servers & agents", "items": top(select(Item).where(in_cats("mcp", "agents"), Item.discovered_at > week))},

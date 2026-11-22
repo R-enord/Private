@@ -99,7 +99,7 @@ def test_feed_radar_home_search_detail(client) -> None:
     assert set(radar["counts"]) == {"5m", "15m", "30m", "60m", "today"}
     assert radar["counts"]["5m"] == radar["counts"]["today"] > 0  # all just discovered
     home = client.get("/api/home").json()
-    assert [s["key"] for s in home["sections"]][:2] == ["important", "trending_repos"]
+    assert [s["key"] for s in home["sections"]][:3] == ["important", "media", "trending_repos"]
     assert home["sections"][-1]["items"] == [] and "No community posts" in home["sections"][-1]["empty_note"]
     s = client.get("/api/search", params={"q": "LLM agents", "include_fixtures": True, "mode": "keyword"}).json()
     assert s["items"] and s["method"] in ("full-text", "fuzzy title match")

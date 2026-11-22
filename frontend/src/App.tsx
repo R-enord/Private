@@ -6,6 +6,7 @@ import { Layout } from "./components/Layout";
 import { ArticleEditor, ArticleView, Community } from "./pages/Community";
 import { Devices, Pair } from "./pages/Devices";
 import { Feed } from "./pages/Feed";
+import { Media } from "./pages/Media";
 import { Home } from "./pages/Home";
 import { ItemDetail } from "./pages/ItemDetail";
 import { Login } from "./pages/Login";
@@ -87,6 +88,7 @@ export default function App() {
           <Route path="community/edit/:id" element={<ArticleEditor />} />
           <Route path="community/:slug" element={<ArticleView />} />
           <Route path="devices" element={<Devices />} />
+          <Route path="media" element={<Media user={user} />} />
           <Route path="*" element={<p>Not found.</p>} />
         </Route>
       </Routes>

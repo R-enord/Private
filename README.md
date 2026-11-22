@@ -85,6 +85,10 @@ notifications) and why.
 
 ## What you get
 
+- **Shorts & News** (phone tabs): Shorts & Reels, News, Videos, Posts and Write-ups, each searchable.
+  - YouTube plays in-app on tap; TikTok, Reels and X links open in their apps.
+  - You can save any link.
+  - Sources need your one-tap review; why TikTok, Reels and X can't be searched directly is in SOURCES.md.
 - **Home**: important discoveries, trending projects (growth-based), model releases, MCP/agents, research, opportunities.
 - **AI Radar**: last 5 / 15 / 30 / 60 minutes and today, by discovery or publication time, with live updates over SSE.
 - **Feed and Search**: filters for category, type, label, verification and source. Search is hybrid: PostgreSQL full-text plus optional local embeddings, with deterministic natural-language hints.

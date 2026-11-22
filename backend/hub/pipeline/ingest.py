@@ -49,10 +49,11 @@ from hub.net.http import HttpError, RateLimited, SafeHttpClient
 from hub.net.throttle import db_throttle, persist_http_log
 from hub.pipeline import classify
 from hub.pipeline.canonical import canonicalize_url, identity_keys
+from hub.pipeline.media import apply_media, detect_media
 from hub.pipeline.scoring import ScoreInput, compute_score, growth_from_snapshots
 
 log = logging.getLogger(__name__)
-CLASS_RANK = {"official": 3, "primary": 2, "independent": 1, "community": 1}
+CLASS_RANK = {"official": 3, "primary": 2, "press": 1, "independent": 1, "community": 1}
 
 
 @dataclass
@@ -132,6 +133,7 @@ def _add_keys(session: Session, item_id: int, keys: list[str]) -> None:
 
 def upsert_item(session: Session, source: Source, norm: Normalized, raw_id: int | None, now: dt.datetime,
                 is_fixture: bool = False) -> tuple[str, Item]:
+    apply_media(norm)  # links to YouTube/TikTok/Reels/X/... become media items, whatever source found them
     keys = identity_keys(norm.url, norm.identity)
     if norm.discussion_url:
         norm.links = {**norm.links, f"discussion_{source.connector_type}": norm.discussion_url}
@@ -403,7 +405,8 @@ def rescore(session: Session, item: Item, now: dt.datetime, terms: list[str] | N
             created_at = None
     growth = []
     since = now - dt.timedelta(days=7)
-    for metric in ("stars", "hf_likes", "hn_points", "hf_upvotes", "hf_downloads"):
+    for metric in ("stars", "hf_likes", "hn_points", "hf_upvotes", "hf_downloads", "yt_views", "devto_reactions",
+                   "masto_boosts", "bsky_likes"):
         if metric not in (item.metrics or {}):
             continue
         pts = [(r[0], r[1]) for r in session.execute(
@@ -584,6 +587,38 @@ def run_source(source_id: int, *, job_id: int | None = None, transport: httpx.Ba
             if not isinstance(error, (HttpError, EgressDenied, RateLimited)):
                 log.exception("source %s failed", src.key, exc_info=error)
     return result
+
+
+def backfill_media(session: Session) -> int:
+    """Re-classify already-collected items whose links are media (YouTube/TikTok/Reels/X/...). Idempotent."""
+    now = dt.datetime.now(dt.UTC)
+    n = 0
+    rows = session.scalars(select(Item).where(Item.merged_into_id.is_(None), Item.kind.in_(("article", "discussion", "other")),
+                                              Item.url.op("~*")(r"(youtube\.com|youtu\.be|tiktok\.com|instagram\.com|//(www\.)?x\.com|"
+                                                                r"twitter\.com|bsky\.app|reddit\.com|vimeo\.com|medium\.com|"
+                                                                r"substack\.com|dev\.to|hashnode)"))).all()
+    for item in rows:
+        m = detect_media(item.url)
+        if m is None:
+            continue
+        extra = dict(item.extra or {})
+        if extra.get("media"):
+            continue
+        extra["media"] = m.as_dict()
+        item.extra = extra
+        if m.format != "writeup":
+            item.links = {**(item.links or {}), "original": item.url}
+            item.kind = m.kind
+            if m.canonical_url:
+                item.url = m.canonical_url
+                item.canonical_url = canonicalize_url(m.canonical_url)
+        _add_keys(session, item.id, [k for k in [m.identity_key] if k])
+        if item.label_method not in ("manual", "ai"):
+            lr = classify.assign_label(item.title, item.summary, item.kind, "community", item.extra)
+            item.label, item.label_evidence = lr.label, lr.evidence[:500]
+        rescore(session, item, now)
+        n += 1
+    return n
 
 
 def item_count(session: Session) -> int:

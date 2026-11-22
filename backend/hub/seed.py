@@ -285,6 +285,126 @@ SOURCES: list[dict[str, Any]] = [
 ]
 
 
+# --------------------------------------------------------------------------- media, social, write-ups, news
+MEDIA_PENDING = (
+    "Pending owner review: implemented, but {host} could not be reached from the build environment (2026-11-22), so "
+    "neither the live format nor the current terms/quota could be verified. Review the terms, then enable."
+)
+YT_CHANNELS = [
+    {"id": "UCbfYPyITQ-7l4upoX8nvctg", "name": "Two Minute Papers"},
+    {"id": "UCZHmQk67mSJgfCCTn7xBfew", "name": "Yannic Kilcher"},
+    {"id": "UCXUPKJO5MZQN11PqgIvyuvQ", "name": "Andrej Karpathy"},
+    {"id": "UCNJ1Ymd5yFuUPtn21xtRbbw", "name": "AI Explained"},
+    {"id": "UCsBjURrPoezykLs9EqgamOA", "name": "Fireship"},
+    {"id": "UCYO_jab_esuFRV4b17AJtAw", "name": "3Blue1Brown"},
+    {"id": "UCfzlCWGWYyIQ0aLC5w48gBQ", "name": "sentdex"},
+    {"id": "UCtYLUTtgS3k1Fg4y5tAhLbw", "name": "StatQuest"},
+    {"id": "UC9-y-6csu5WGm29I7JiwpnA", "name": "Computerphile"},
+    {"id": "UCSHZKyawb77ixDdsGog4iWA", "name": "Lex Fridman"},
+]
+YT_TERMS = "https://www.youtube.com/t/terms ; https://developers.google.com/youtube/terms/api-services-terms-of-service"
+
+
+def _media_source(key: str, name: str, ctype: str, endpoint: str, host: str, publisher: str, source_class: str,
+                  config: dict[str, Any], *, interval_s: int, min_interval_s: int, terms_url: str, quota: str,
+                  storage: str, attribution: str, categories: list[str], auth: str = "none",
+                  access: str = "public API", spacing: float = 1.0, extra_hosts: list[str] | None = None,
+                  enabled: bool = False, reason: str | None = None) -> dict[str, Any]:
+    return {
+        "key": key, "name": name, "connector_type": ctype, "endpoint": endpoint, "homepage": f"https://{host}",
+        "publisher": publisher, "source_class": source_class, "access_method": access, "auth_method": auth,
+        "cost_status": "free_public", "quota_notes": quota, "terms_url": terms_url,
+        "terms_status": config.pop("terms_status", "unverified"),
+        "terms_checked_at": None, "attribution": attribution, "storage_notes": storage,
+        "allowed_hosts": [host, *(extra_hosts or [])], "min_interval_s": min_interval_s, "interval_s": interval_s,
+        "host_min_spacing_s": spacing, "config": config, "categories_hint": categories, "enabled": enabled,
+        "disabled_reason": reason if reason is not None else MEDIA_PENDING.format(host=host),
+    }
+
+
+MEDIA_STORAGE = ("Store title, link, channel/author, dates, counts and a short excerpt only. Videos are never "
+                 "downloaded; playback uses the platform's own embedded player on tap, or a link to the original.")
+
+SOURCES += [
+    _media_source("youtube-ai-channels", "YouTube — AI channels (RSS feeds)", "youtube",
+                  "https://www.youtube.com/feeds/videos.xml?channel_id={id}", "www.youtube.com", "YouTube (channel owners)",
+                  "primary", {"mode": "feed", "channels": YT_CHANNELS, "min_relevance": 0.35},
+                  interval_s=3600, min_interval_s=1800, terms_url=YT_TERMS, access="public channel Atom feeds (no key)",
+                  quota="No published quota for channel feeds; polled hourly with ETags. Channel IDs were not verified live.",
+                  storage=MEDIA_STORAGE, attribution="Video by the channel on YouTube; plays in YouTube's player.",
+                  categories=["workflows"]),
+    _media_source("youtube-api-search", "YouTube — topic search incl. Shorts (Data API)", "youtube",
+                  "https://www.googleapis.com/youtube/v3/search", "www.googleapis.com", "YouTube Data API",
+                  "primary", {"mode": "api_search", "queries": ["LLM", "AI agents", "MCP server", "open source AI model",
+                                                                "local LLM", "AI coding"],
+                              "daily_unit_budget": 8000, "published_within_days": 3, "max_results": 25,
+                              "min_relevance": 0.35},
+                  interval_s=7200, min_interval_s=3600, terms_url=YT_TERMS, auth="free API key (HUB_YOUTUBE_API_KEY)",
+                  access="YouTube Data API v3", quota="Google project quota (commonly 10,000 units/day; search = 100 "
+                  "units, videos.list = 1). The hub enforces its own budget (8,000/day). Not verified this session.",
+                  storage=MEDIA_STORAGE, attribution="Video metadata via the YouTube Data API.", categories=["workflows"],
+                  reason="Needs your free YouTube Data API key (HUB_YOUTUBE_API_KEY) and terms review; "
+                         "googleapis.com was not reachable from the build environment."),
+    _media_source("devto-ai", "dev.to — AI / LLM write-ups", "devto", "https://dev.to/api/articles?tag={tag}", "dev.to",
+                  "DEV Community (authors)", "independent", {"tags": ["ai", "llm", "machinelearning", "agents", "rag"],
+                                                             "per_page": 30, "min_relevance": 0.35},
+                  interval_s=3600, min_interval_s=1800, terms_url="https://dev.to/terms ; https://developers.forem.com/api",
+                  quota="Public read API; rate limits not verified this session.", storage=MEDIA_STORAGE,
+                  attribution="Article by its author on DEV Community.", categories=["workflows"],
+                  extra_hosts=["media2.dev.to"]),
+    _media_source("mastodon-ai", "Mastodon — #LLM #AI hashtags (mastodon.social)", "mastodon",
+                  "https://mastodon.social/api/v1/timelines/tag/{tag}", "mastodon.social", "Mastodon users",
+                  "community", {"instance": "https://mastodon.social", "tags": ["llm", "ai", "machinelearning",
+                                                                                  "localllm", "aiagents"],
+                                "min_relevance": 0.35},
+                  interval_s=1800, min_interval_s=900, terms_url="https://mastodon.social/about ; https://docs.joinmastodon.org/methods/timelines/",
+                  quota="Public hashtag timelines; instance rate limits (Mastodon default 300 req/5 min) not verified.",
+                  storage=MEDIA_STORAGE + " Sensitive/content-warning posts are skipped.",
+                  attribution="Post by its author on Mastodon.", categories=[]),
+    _media_source("bluesky-ai", "Bluesky — AI / LLM posts (public search)", "bluesky",
+                  "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts", "public.api.bsky.app", "Bluesky users",
+                  "community", {"queries": ["LLM", "AI agents", "MCP server", "open source model"], "limit": 25,
+                                "min_relevance": 0.35},
+                  interval_s=1800, min_interval_s=900, terms_url="https://bsky.social/about/support/tos ; https://docs.bsky.app/",
+                  quota="Public AppView; whether search needs auth and its limits were not verified.",
+                  storage=MEDIA_STORAGE + " Adult-labelled posts are skipped.", attribution="Post by its author on Bluesky.",
+                  categories=[]),
+    _media_source("saved-links", "Links you saved (TikTok, Reels, YouTube, X, posts…)", "manual", "(manual)", "localhost",
+                  "You", "independent", {"terms_status": "n/a"}, interval_s=7 * 86400, min_interval_s=86400,
+                  terms_url="", quota="No network requests (optional official oEmbed previews are off by default).",
+                  storage="The URL, your title/note, and (if enabled) the platform's public oEmbed title/thumbnail.",
+                  attribution="Saved by you; links to the original platform.", categories=[], access="manual",
+                  enabled=True, reason=""),
+    _rss("news-techcrunch-ai", "TechCrunch — AI", "https://techcrunch.com/category/artificial-intelligence/feed/",
+         "https://techcrunch.com/category/artificial-intelligence/", "TechCrunch", "press", enabled=False,
+         terms_status="unverified", disabled_reason=MEDIA_PENDING.format(host="techcrunch.com"), categories=["industry"]),
+    _rss("news-verge-ai", "The Verge — AI", "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+         "https://www.theverge.com/ai-artificial-intelligence", "The Verge", "press", enabled=False,
+         terms_status="unverified", disabled_reason=MEDIA_PENDING.format(host="www.theverge.com"), categories=["industry"]),
+    _rss("news-ars-ai", "Ars Technica — AI", "https://arstechnica.com/ai/feed/", "https://arstechnica.com/ai/",
+         "Ars Technica", "press", enabled=False, terms_status="unverified",
+         disabled_reason=MEDIA_PENDING.format(host="arstechnica.com"), categories=["industry"]),
+    _rss("news-venturebeat-ai", "VentureBeat — AI", "https://venturebeat.com/category/ai/feed/",
+         "https://venturebeat.com/category/ai/", "VentureBeat", "press", enabled=False, terms_status="unverified",
+         disabled_reason=MEDIA_PENDING.format(host="venturebeat.com"), categories=["industry"]),
+    _rss("news-mit-tr-ai", "MIT Technology Review — AI", "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+         "https://www.technologyreview.com/topic/artificial-intelligence/", "MIT Technology Review", "press",
+         enabled=False, terms_status="unverified",
+         disabled_reason=MEDIA_PENDING.format(host="www.technologyreview.com"), categories=["industry", "research"]),
+    _rss("reddit-localllama", "Reddit — r/LocalLLaMA (top today)", "https://www.reddit.com/r/LocalLLaMA/top/.rss?t=day",
+         "https://www.reddit.com/r/LocalLLaMA/", "Reddit users", "community", enabled=False, terms_status="unverified",
+         disabled_reason=MEDIA_PENDING.format(host="www.reddit.com") + " Reddit's Data API terms apply; if Reddit "
+         "refuses automated feed access, the hub backs off and does not work around it.", categories=["llm"]),
+    _rss("reddit-machinelearning", "Reddit — r/MachineLearning (top today)",
+         "https://www.reddit.com/r/MachineLearning/top/.rss?t=day", "https://www.reddit.com/r/MachineLearning/",
+         "Reddit users", "community", enabled=False, terms_status="unverified",
+         disabled_reason=MEDIA_PENDING.format(host="www.reddit.com"), categories=["research"]),
+    _rss("medium-llm", "Medium — #llm tag", "https://medium.com/feed/tag/llm", "https://medium.com/tag/llm",
+         "Medium authors", "independent", enabled=False, terms_status="unverified",
+         disabled_reason=MEDIA_PENDING.format(host="medium.com"), categories=["workflows"], ai_filter=True),
+]
+
+
 def seed_categories(session: Session) -> None:
     existing = {c.slug for c in session.scalars(select(Category))}
     for i, (slug, name, desc) in enumerate(CATEGORIES):

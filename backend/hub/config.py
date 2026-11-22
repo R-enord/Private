@@ -58,6 +58,7 @@ class Settings(BaseSettings):
     # --- Optional free credentials (never required) ---
     github_token: SecretStr | None = None
     hf_token: SecretStr | None = None
+    youtube_api_key: SecretStr | None = None  # free key; only for the optional YouTube Data API search source
 
     # --- Local AI (Ollama) ---
     ollama_url: str = "http://127.0.0.1:11434"

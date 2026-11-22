@@ -183,8 +183,8 @@ def assign_label(title: str, text: str, kind: str, source_class: str, extra: dic
         return LabelResult("release", f"title contains '{m.group(0)}'")
     if kind == "repository" or kind == "space":
         return LabelResult("release", f"newly discovered public {kind}")
-    if kind == "discussion":
-        return LabelResult("discussion", "community discussion")
+    if kind in ("discussion", "post"):
+        return LabelResult("discussion", "community post or discussion")
     if source_class == "official":
         return LabelResult("announcement", "published by an official source")
     return LabelResult("unlabeled", "no rule matched")
@@ -192,7 +192,7 @@ def assign_label(title: str, text: str, kind: str, source_class: str, extra: dic
 
 # --------------------------------------------------------------------------- verification
 
-VERIFICATION_ORDER = ["official", "corroborated", "primary", "community", "unverified"]
+VERIFICATION_ORDER = ["official", "corroborated", "primary", "reported", "community", "unverified"]
 
 
 def verification_level(source_classes: list[str], distinct_publishers: int) -> str:
@@ -203,6 +203,8 @@ def verification_level(source_classes: list[str], distinct_publishers: int) -> s
         return "corroborated"
     if "primary" in classes:
         return "primary"
+    if "press" in classes:
+        return "reported"  # independent news reporting: not an official statement
     if classes & {"community", "independent"}:
         return "community"
     return "unverified"

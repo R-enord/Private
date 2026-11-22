@@ -16,4 +16,9 @@ application database at runtime, and any record created from them in tests is fl
 | arxiv_query.xml | `GET https://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=4` | 2026-11-22 | real (metadata is CC0) |
 | rss_hf_blog.xml | `GET https://huggingface.co/blog/feed.xml` | 2026-11-22 | real, truncated to 3 items |
 | atom_simonwillison.xml | `GET https://simonwillison.net/atom/everything/` | 2026-11-22 | real, truncated to 3 entries (Atom parsing test only) |
+| youtube_feed.xml | **synthetic** — shaped per YouTube's channel Atom feed (`yt:videoId`, `media:group`) | 2026-11-22 | www.youtube.com blocked in the build env |
+| youtube_api_search.json, youtube_api_videos.json | **synthetic** — shaped per YouTube Data API v3 `search.list` / `videos.list` | 2026-11-22 | no API key / host blocked |
+| devto_articles.json | **synthetic** — shaped per the Forem `/api/articles` response | 2026-11-22 | dev.to blocked |
+| mastodon_tag.json | **synthetic** — shaped per Mastodon `Status` entities | 2026-11-22 | mastodon.social blocked |
+| bluesky_search.json | **synthetic** — shaped per `app.bsky.feed.searchPosts` | 2026-11-22 | public.api.bsky.app blocked |
 | malicious_feed.xml | **synthetic** — adversarial feed (script tags, javascript: links, prompt-injection text) | 2026-11-22 | security tests |

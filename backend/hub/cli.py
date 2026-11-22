@@ -41,9 +41,13 @@ def cmd_migrate(_: argparse.Namespace) -> int:
     cfg = Config(str(BACKEND / "alembic.ini"))
     cfg.set_main_option("script_location", str(BACKEND / "migrations"))
     command.upgrade(cfg, "head")
+    from hub.pipeline.ingest import backfill_media
+
     with session_scope() as s:
         seed_all(s)
-    print("database migrated and source registry seeded")
+    with session_scope() as s:
+        n = backfill_media(s)
+    print(f"database migrated and source registry seeded; {n} existing item(s) re-classified as media")
     return 0
 
 

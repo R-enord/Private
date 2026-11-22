@@ -110,6 +110,18 @@ Source and terms audit is in [SOURCES.md](SOURCES.md); environment assessment is
 | Android APK wrapper | not started (no Android SDK in build env; optional) |
 | Web Push while closed | **blocked pending owner approval**: third-party push services, terms unverified |
 
+## Media section: shorts, reels, videos, posts, write-ups, news (added 2026-11-22)
+
+| Feature | Status |
+|---|---|
+| Media page with tabs Shorts & Reels · News · Videos · Posts · Write-ups, in-section search, phone tabs Shorts/News | complete (tests + emulated phone) |
+| Media detection for links from any source (YouTube/Shorts, TikTok, Reels, X, Bluesky, Reddit, Vimeo, blogs) + backfill | complete (live: 8 real items re-classified) |
+| Tap-to-play YouTube (privacy-enhanced player); link-out for TikTok/Instagram/X | complete |
+| Save a link (no page fetch; optional official oEmbed off by default) | complete |
+| Privacy thumbnail proxy (hub fetches; phone never contacts platforms; off by default) | complete |
+| Connectors: YouTube feeds, YouTube Data API (free key + budget), dev.to, Mastodon, Bluesky; news/Reddit/Medium RSS | **partial**: implemented and fixture-tested; **live verification blocked** (hosts not allowed in the build env); shipped disabled pending owner review |
+| TikTok / Instagram Reels / X topic discovery | **blocked**: no free permitted API (see SOURCES.md) |
+
 ## Next steps (proposed)
 
 1. Owner: run `make doctor`, pick a model size, then review and enable the official lab feeds you want.

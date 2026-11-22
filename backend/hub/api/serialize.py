@@ -82,6 +82,7 @@ def item_card(item: Item, ctx: dict[str, Any]) -> dict[str, Any]:
         "ai_summary": {"summary": ai.get("summary"), "model": ai.get("model"), "status": ai.get("status")}
         if ai.get("status") == "ok" else None,
         "bookmarked": item.id in ctx["marks"],
+        "media": (item.extra or {}).get("media"),
         "is_fixture": item.is_fixture,
     }
 

@@ -33,9 +33,40 @@ ships **disabled** with a reason and needs an explicit, audited owner acknowledg
 Enabling one of these records an audit-log entry (`source.enable`, `acknowledged_terms=true`) and the date in
 the source's notes.
 
+## Media section: shorts, videos, social posts, write-ups, news (added 2026-11-22)
+
+All of these are **implemented** and ship **disabled pending owner review**. Their hosts were refused by the
+build environment's network policy (403), and the request to widen it was rejected by the environments service,
+so neither the live response formats nor the current terms and quotas could be verified. Tests use **synthetic**
+fixtures written to each platform's documented format (`backend/tests/fixtures/README.md`).
+
+| Source | Access | Notes |
+|---|---|---|
+| YouTube: AI channels (`youtube-ai-channels`) | public per-channel Atom feeds, no key | 10 channels; IDs not verified live; AI-relevance filter; Shorts detected from `/shorts/` links or `#shorts` |
+| YouTube: topic search (`youtube-api-search`) | YouTube Data API v3, **your free key** (`HUB_YOUTUBE_API_KEY`) | Hub-enforced budget of 8,000 units/day (search = 100, videos = 1). Shorts = ≤ 180 s. Key sent as a header, never logged |
+| dev.to (`devto-ai`) | public Forem API | write-ups tagged ai/llm/agents/rag |
+| Mastodon (`mastodon-ai`) | public hashtag timelines on mastodon.social | sensitive and content-warning posts skipped; posts sharing a video become that video |
+| Bluesky (`bluesky-ai`) | public AppView `searchPosts` | adult-labelled posts skipped; whether search needs auth is unverified |
+| News: TechCrunch, The Verge, Ars Technica, VentureBeat, MIT Technology Review | RSS | verification level **reported** (independent press, not official) |
+| Reddit r/LocalLLaMA, r/MachineLearning | RSS | Reddit Data API terms apply; if Reddit refuses automated access, the hub backs off and does not work around it |
+| Medium #llm | RSS | AI-relevance filter |
+| Saved links (`saved-links`) | your own input | **enabled**; never fetches the page. Optional official oEmbed titles (YouTube/TikTok/X) are off by default |
+
+**Not available, and why** (by design, no workaround):
+- **TikTok:** no free public API to discover videos by topic (official research access is for approved
+  researchers), and scraping is not permitted.
+- **Instagram Reels:** hashtag search requires an approved Meta business app.
+- **X:** API reads are paid (zero-cost mode).
+
+Links from all three still appear when a permitted source (HN, Mastodon, Bluesky, RSS) or you share them. They
+open in the platform; only YouTube plays in-app.
+
+Even before any of these are enabled, the section already has **real content from enabled sources**. On
+2026-11-22, `hub migrate` re-classified 8 existing HN items: 5 YouTube videos, 2 write-ups and 1 X post.
+
 ## Not implemented (Phase 3 candidates, not yet audited)
 
-Reddit, Product Hunt, GitLab, Codeberg, public X content, Discord, forums, newsletters. Until audited, their
+Product Hunt, GitLab, Codeberg, Discord, forums, newsletters. Until audited, their
 API hosts are on the zero-cost denylist (e.g. `oauth.reddit.com`, `api.producthunt.com`; the X API is paid).
 
 ## Evidence notes

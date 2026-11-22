@@ -22,13 +22,13 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from hub import __version__
-from hub.api import routes_admin, routes_community, routes_devices, routes_items, routes_user
+from hub.api import routes_admin, routes_community, routes_devices, routes_items, routes_media, routes_user
 from hub.config import get_settings
 from hub.net.lanaddr import client_allowed, effective_allowed_hosts
 
 CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
        "connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; "
-       "frame-ancestors 'none'")
+       "frame-src https://www.youtube-nocookie.com; frame-ancestors 'none'")
 SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
 
 
@@ -124,6 +124,7 @@ def create_app() -> FastAPI:
     app.include_router(routes_user.router)
     app.include_router(routes_community.router)
     app.include_router(routes_devices.router)
+    app.include_router(routes_media.router)
 
     @app.get("/api/health")
     def health() -> dict[str, Any]:

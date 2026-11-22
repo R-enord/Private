@@ -219,3 +219,52 @@ token; then Phase 3 source audits (Reddit, Product Hunt, GitLab, Codeberg).
 
 **Not done** (see MOBILE.md): store-distributed native apps (fees), Android APK wrapper (no SDK here), closed-app
 push (third-party push services, unverified terms), real-device testing.
+
+## 2026-11-22 — Media section: shorts, reels, videos, social posts, write-ups, news
+
+**Network.** The media hosts (www.youtube.com, dev.to, mastodon.social, public.api.bsky.app, www.tiktok.com,
+news sites) were refused by the egress proxy (403). Two `update_environment` requests, one adding 20 hosts and
+one swapping 8 unused hosts for 10 new ones, were **rejected by the environments service** (nothing changed).
+So no live call to these platforms was possible. Everything that depends on them is tested against synthetic
+fixtures in each platform's documented format, and those sources ship disabled pending review.
+
+**Built**
+- `hub/pipeline/media.py`: URL detection for YouTube/Shorts, TikTok, Instagram Reels/posts, X, Bluesky, Reddit,
+  Vimeo and blog platforms. Applied centrally in ingestion, so links from *any* source become media items with
+  identity keys, enabling cross-source dedup. Backfill runs in `hub migrate`.
+- New kinds `short`, `video`, `post`, and a new verification level `reported` (independent press).
+- Connectors:
+  - `youtube` (channel feeds; Data API mode with key header, budget, ≤180 s Shorts);
+  - `devto`;
+  - `mastodon` (skips sensitive/CW/boosts, dedupes across tags);
+  - `bluesky` (skips adult labels);
+  - `manual` (saved links).
+- 14 new seeded sources; only "Saved links" enabled.
+- `/api/media` (tabs, search, counts), `/api/media/links` (save; never fetches the page; oEmbed off by
+  default), `/api/media/thumb/{id}` (hub-side image proxy, allowlist, image types, 2 MB, cache; off by
+  default), `/api/media/sources` (review panel and why TikTok/Reels/X are unavailable).
+- CSP: `frame-src https://www.youtube-nocookie.com` only.
+- UI: Media page (Shorts & Reels default; full-height swipe cards on the phone, grid on desktop; tap-to-play
+  YouTube; link-out for TikTok/IG/X); News/Videos/Posts/Write-ups tabs; save-link form; review-and-enable panel.
+  Phone tabs are now Home · Radar · Shorts · News · More, with Search and Alerts in the header. Home has a
+  "Shorts & videos" section.
+
+**Verified**
+
+| Check | Result |
+|---|---|
+| `uv run pytest -q` | **187 passed** (32 new media tests); ruff, mypy, alembic check clean |
+| Frontend typecheck / lint / tests / build | pass |
+| `hub migrate` on the live DB | **8 real items re-classified**: 5 YouTube videos, 2 write-ups, 1 X post (all found by the HN connector) |
+| Emulated iPhone 15, live server over the LAN address | tabs Home·Radar·Shorts·News·More; Videos tab shows the 5 real YouTube videos; **no iframe before tapping**, after tap `https://www.youtube-nocookie.com/embed/…` with `referrerpolicy=strict-origin-when-cross-origin`; News 307, Posts 17, Write-ups 3; 0 px horizontal overflow |
+| Emulated Pixel 7, separate **demo** database seeded only with the labeled fixtures | Shorts shows YouTube + TikTok cards, each badged **TEST FIXTURE**; the TikTok card links out ("Open in TikTok"); saving an Instagram Reel link created an Instagram short card; review panel lists 13 pending sources and the TikTok/Reels/X explanations; no page errors |
+
+**Fixed during verification**
+- The same Mastodon post under several hashtags was yielded once per tag → deduped per run.
+- The demo-seeding script imported test code, which repoints the DB to `hub_test` → reseeded the demo DB
+  without test imports.
+- Short cards overlapped the Play/Open button with the title and were taller than the screen; the header
+  wrapped → fixed.
+
+**Not verified:** live formats and terms for YouTube, dev.to, Mastodon, Bluesky and the news, Reddit and Medium
+feeds (hosts blocked); in-app YouTube playback itself (YouTube is not reachable from the build env); oEmbed.

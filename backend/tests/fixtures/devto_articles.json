@@ -1,0 +1,4 @@
+[
+ {"id": 2100001, "title": "Building a RAG pipeline with pgvector and a local LLM", "description": "Step-by-step guide to retrieval-augmented generation on your laptop.", "url": "https://dev.to/example/building-a-rag-pipeline-1abc", "published_at": "2026-11-21T12:00:00Z", "tag_list": ["ai", "llm", "rag"], "user": {"name": "Example Dev", "username": "example"}, "public_reactions_count": 87, "comments_count": 12, "reading_time_minutes": 8, "cover_image": "https://media2.dev.to/dynamic/image/cover.png"},
+ {"id": 2100002, "title": "CSS tricks for 2027", "description": "Grid and container queries.", "url": "https://dev.to/example/css-tricks-2xyz", "published_at": "2026-11-21T13:00:00Z", "tag_list": ["css"], "user": {"name": "Other Dev", "username": "other"}, "public_reactions_count": 5, "comments_count": 0, "reading_time_minutes": 3, "cover_image": null}
+]

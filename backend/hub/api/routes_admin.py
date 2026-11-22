@@ -202,7 +202,7 @@ def source_action(source_id: int, action: str, body: EnableBody | None = None,
     if s.cost_status not in ("free_public", "free_tier"):
         raise HTTPException(400, "zero-cost mode: only free sources can be enabled")
     if action == "enable":
-        if s.terms_status != "verified" and not (body and body.acknowledge_terms):
+        if s.terms_status not in ("verified", "n/a") and not (body and body.acknowledge_terms):
             raise HTTPException(409, "terms not verified for this source; review them and confirm acknowledge_terms")
         s.enabled, s.paused, s.next_run_at = True, False, None
         if s.terms_status != "verified":

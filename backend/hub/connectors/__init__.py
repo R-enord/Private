@@ -8,11 +8,18 @@ from hub.connectors.github import GitHubConnector
 from hub.connectors.hackernews import HackerNewsConnector, HNAlgoliaConnector
 from hub.connectors.huggingface import HuggingFaceConnector
 from hub.connectors.rss import RSSConnector
+from hub.connectors.social import (
+    BlueskyConnector,
+    DevToConnector,
+    ManualConnector,
+    MastodonConnector,
+    YouTubeConnector,
+)
 
 CONNECTORS: dict[str, type[Connector]] = {
     c.type: c
     for c in (GitHubConnector, HuggingFaceConnector, HackerNewsConnector, HNAlgoliaConnector, ArxivConnector,
-              RSSConnector)
+              RSSConnector, YouTubeConnector, DevToConnector, MastodonConnector, BlueskyConnector, ManualConnector)
 }
 
 

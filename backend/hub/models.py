@@ -253,13 +253,14 @@ class RawRecord(Base):
 # ---------------------------------------------------------------------------
 
 ITEM_KINDS = (
-    "repository", "model", "dataset", "space", "paper", "article", "discussion", "release", "opportunity", "other",
+    "repository", "model", "dataset", "space", "paper", "article", "discussion", "release", "opportunity",
+    "short", "video", "post", "other",
 )
 ITEM_LABELS = (
     "announcement", "research", "preview", "beta", "release", "update", "deprecation", "rumor", "opportunity",
     "discussion", "unlabeled",
 )
-VERIFICATION = ("official", "primary", "corroborated", "community", "unverified")
+VERIFICATION = ("official", "primary", "corroborated", "reported", "community", "unverified")
 
 
 class Item(Base):

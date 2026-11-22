@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <title>Example AI Channel (synthetic)</title>
+ <entry>
+  <id>yt:video:AAAAAAAAAA1</id><yt:videoId>AAAAAAAAAA1</yt:videoId><yt:channelId>UCexample000000000000000</yt:channelId>
+  <title>Run an LLM agent locally with Ollama in 60 seconds #shorts</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/AAAAAAAAAA1"/>
+  <author><name>Example AI Channel</name><uri>https://www.youtube.com/channel/UCexample000000000000000</uri></author>
+  <published>2026-11-21T18:00:00+00:00</published><updated>2026-11-21T19:00:00+00:00</updated>
+  <media:group><media:title>Run an LLM agent locally</media:title>
+   <media:thumbnail url="https://i2.ytimg.com/vi/AAAAAAAAAA1/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Quick demo of a local agent with an MCP server.</media:description>
+   <media:community><media:starRating count="321" average="5.00" min="1" max="5"/><media:statistics views="12000"/></media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:BBBBBBBBBB2</id><yt:videoId>BBBBBBBBBB2</yt:videoId><yt:channelId>UCexample000000000000000</yt:channelId>
+  <title>Fine-tuning open-weights LLMs: a practical guide</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=BBBBBBBBBB2"/>
+  <author><name>Example AI Channel</name><uri>https://www.youtube.com/channel/UCexample000000000000000</uri></author>
+  <published>2026-11-20T15:00:00+00:00</published><updated>2026-11-20T15:00:00+00:00</updated>
+  <media:group><media:description>LoRA, QLoRA and evaluation on a single GPU.</media:description>
+   <media:community><media:statistics views="45000"/></media:community></media:group>
+ </entry>
+ <entry>
+  <id>yt:video:CCCCCCCCCC3</id><yt:videoId>CCCCCCCCCC3</yt:videoId><yt:channelId>UCexample000000000000000</yt:channelId>
+  <title>My trip to the mountains</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=CCCCCCCCCC3"/>
+  <author><name>Example AI Channel</name></author>
+  <published>2026-11-19T10:00:00+00:00</published>
+  <media:group><media:description>Hiking vlog.</media:description></media:group>
+ </entry>
+</feed>

@@ -6,7 +6,7 @@ import { ExternalLink, LabelBadge, VerificationBadge } from "./ui";
 
 const KIND_ICON: Record<string, string> = {
   repository: "⌥", model: "◈", dataset: "▤", space: "▶", paper: "§", article: "✎", discussion: "💬", release: "⇪",
-  opportunity: "★", other: "•",
+  opportunity: "★", short: "▶", video: "▶", post: "💬", other: "•",
 };
 
 export function ItemCardView({ item, isNew, onChange }: { item: Item; isNew?: boolean; onChange?: (i: Item) => void }) {
@@ -27,6 +27,11 @@ export function ItemCardView({ item, isNew, onChange }: { item: Item; isNew?: bo
           <div className="flex flex-wrap items-center gap-1.5">
             <LabelBadge label={item.label} evidence={item.label_evidence} />
             <VerificationBadge level={item.verification} />
+            {item.media && item.media.format !== "writeup" && (
+              <span className="rounded bg-slate-900 px-1.5 py-0.5 text-xs font-semibold text-white dark:bg-slate-100 dark:text-slate-900">
+                {item.media.format === "short" ? "▶ short" : item.media.format === "video" ? "▶ video" : "post"} · {item.media.platform}
+              </span>
+            )}
             {item.is_fixture && <span className="rounded bg-yellow-200 px-1 text-xs text-yellow-900">TEST FIXTURE</span>}
             {isNew && <span className="rounded bg-blue-600 px-1 text-xs text-white">new</span>}
           </div>

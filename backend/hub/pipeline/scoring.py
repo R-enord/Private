@@ -24,8 +24,10 @@ DEFAULT_WEIGHTS: dict[str, float] = {
 }
 
 HALF_LIFE_H = {"paper": 72, "repository": 72, "model": 72, "dataset": 96, "space": 72, "article": 48,
-               "discussion": 24, "release": 96, "opportunity": 168, "other": 48}
-CREDIBILITY = {"official": 0.9, "corroborated": 0.8, "primary": 0.7, "community": 0.5, "unverified": 0.3}
+               "discussion": 24, "release": 96, "opportunity": 168, "short": 36, "video": 72, "post": 24,
+               "other": 48}
+CREDIBILITY = {"official": 0.9, "corroborated": 0.8, "primary": 0.7, "reported": 0.6, "community": 0.5,
+               "unverified": 0.3}
 
 
 @dataclass
@@ -113,7 +115,8 @@ def compute_score(si: ScoreInput, now: dt.datetime, weights: dict[str, float] | 
     best = (0.0, "no adoption signal reported by sources")
     for g in si.growth:
         ref_v = {"stars": 150.0, "hf_likes": 80.0, "hn_points": 400.0, "hf_upvotes": 60.0,
-                 "hf_downloads": 50000.0}.get(g.metric, 100.0)
+                 "hf_downloads": 50000.0, "yt_views": 20000.0, "devto_reactions": 100.0, "masto_boosts": 50.0,
+                 "bsky_likes": 200.0}.get(g.metric, 100.0)
         v = _log_norm(g.per_day, ref_v)
         label = {"snapshots": f"measured over {g.window_h:.0f} h", "since_creation": "average since creation",
                  "since_post": "since posted"}[g.method]

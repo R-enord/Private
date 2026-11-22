@@ -22,6 +22,8 @@ DEFAULTS: dict[str, Any] = {
     "low_resource_mode": False,
     "allow_private_content_to_cloud": False,  # informational mirror of the env invariant (always False here)
     "scheduler_state": {},
+    "media_previews_enabled": False,  # hub-side thumbnail proxy (YouTube/dev.to/Mastodon/Bluesky images)
+    "media_oembed_enabled": False,  # official oEmbed metadata for saved YouTube/TikTok/X links
 }
 
 

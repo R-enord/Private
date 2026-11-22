@@ -12,12 +12,13 @@ arXiv and so on; only your computer does.
 
 | Feature | Status |
 |---|---|
-| Phone-sized layout: bottom tabs (Home, Radar, Search, Alerts, More), collapsible filters, scrollable tables, safe-area aware | complete (verified on emulated iPhone 15 and Pixel 7: no horizontal overflow on 9 pages) |
+| Phone-sized layout: bottom tabs (Home, Radar, **Shorts**, **News**, More), with Search and Alerts as header icons; collapsible filters, scrollable tables, safe-area aware | complete (verified on emulated iPhone 15 and Pixel 7: no horizontal overflow on 9 pages) |
 | Install to home screen (icon, full-screen, shortcuts to Radar/Search/Alerts) | complete. Android: "Install app" in More. iPhone: Safari → Share → "Add to Home Screen". **Needs https** for Android install; see below |
 | Offline reading: pages you opened stay readable when the computer is asleep or you have no connection, with an "Offline" banner | complete (verified: service worker active, pages served offline). **Needs https** |
 | QR pairing: no password typed on the phone. One-time code, 10 minutes, single use | complete |
 | Device list, revoke a device, "log out all other devices" | complete |
 | Live AI Radar updates, alerts badge while the app is open | complete (same SSE stream as desktop) |
+| Shorts & Reels feed: full-height swipe on the phone, tap to play YouTube in-app, TikTok/Reels/X open in their apps; News, Videos, Posts, Write-ups tabs; save any link | complete (see SOURCES.md "Media section" for which sources still need your review) |
 | Push notifications while the app is closed | **not implemented** (see "What I could not implement") |
 
 ## Setup option A: same Wi-Fi (simplest)

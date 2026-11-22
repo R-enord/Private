@@ -28,6 +28,18 @@ Off by default. When enabled:
 Details are in MOBILE.md. Over plain http on a LAN, traffic is unencrypted on your Wi-Fi; prefer https via
 mkcert or Tailscale.
 
+## Media and embeds
+
+- CSP allows exactly one frame origin, `https://www.youtube-nocookie.com` (YouTube's privacy-enhanced player).
+  Nothing is framed until you tap Play.
+- TikTok, Instagram and X are never embedded (that would load their scripts); they open as links.
+- Thumbnails are fetched by the hub from an image-host allowlist, only when previews are enabled:
+  - image content types only, max 2 MB, cached in `data/media-cache`;
+  - the phone and browser never contact the platforms for previews.
+- Saved links are stored, never fetched (no SSRF surface). Optional metadata comes only from official oEmbed
+  endpoints, which are off by default.
+- The YouTube API key is sent as a header only to googleapis.com and is never logged.
+
 ## Secrets
 
 - Put secrets in `.env` (git-ignored) or the process environment. Never commit them, paste them into issues or

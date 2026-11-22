@@ -7,6 +7,7 @@ import type { User } from "../lib/types";
 const NAV: [string, string, string?][] = [
   ["/", "Home"],
   ["/radar", "AI Radar"],
+  ["/media", "Shorts & News"],
   ["/feed", "Feed"],
   ["/search", "Search"],
   ["/opportunities", "Opportunities"],
@@ -27,6 +28,8 @@ const ICON_PATHS: Record<string, string> = {
   search: "M11 11m-7 0a7 7 0 1 0 14 0a7 7 0 1 0-14 0M16.5 16.5L21 21",
   bell: "M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0",
   menu: "M4 6h16M4 12h16M4 18h16",
+  play: "M7 4v16l13-8z",
+  news: "M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2M7 9h7M7 13h7M7 16h4",
 };
 function Icon({ name }: { name: string }) {
   return (
@@ -38,8 +41,8 @@ function Icon({ name }: { name: string }) {
 const TABS: [string, string, string][] = [
   ["/", "Home", "home"],
   ["/radar", "Radar", "radar"],
-  ["/search", "Search", "search"],
-  ["/alerts", "Alerts", "bell"],
+  ["/media?tab=shorts", "Shorts", "play"],
+  ["/media?tab=news", "News", "news"],
 ];
 const RANK: Record<string, number> = { viewer: 0, member: 1, moderator: 2, admin: 3, owner: 4 };
 
@@ -64,7 +67,7 @@ export function Layout({ user, onLogout }: { user: User; onLogout: () => void })
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 pt-[env(safe-area-inset-top)] backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2">
           <span className="font-bold tracking-tight">AI Intelligence Hub</span>
-          <span className="rounded bg-emerald-100 px-1.5 text-[10px] font-semibold uppercase text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300" title="Hard zero-cost mode: paid endpoints are blocked in code">
+          <span className="hidden rounded bg-emerald-100 px-1.5 text-[10px] font-semibold uppercase text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 md:inline" title="Hard zero-cost mode: paid endpoints are blocked in code">
             local · zero-cost
           </span>
           <nav className="hidden flex-wrap gap-1 text-sm md:flex">
@@ -85,9 +88,14 @@ export function Layout({ user, onLogout }: { user: User; onLogout: () => void })
               log out
             </button>
           </div>
-          <button onClick={() => window.location.reload()} className="ml-auto rounded px-2 py-1 text-lg md:hidden" aria-label="Refresh">
-            ↻
-          </button>
+          <div className="ml-auto flex items-center gap-1 md:hidden">
+            <NavLink to="/search" className="rounded p-2" aria-label="Search"><Icon name="search" /></NavLink>
+            <NavLink to="/alerts" className="relative rounded p-2" aria-label={`Alerts${unread ? `, ${unread} unread` : ""}`}>
+              <Icon name="bell" />
+              {unread > 0 && <span className="absolute right-0 top-0 min-w-4 rounded-full bg-rose-600 px-1 text-center text-[10px] font-semibold text-white">{unread > 99 ? "99+" : unread}</span>}
+            </NavLink>
+            <button onClick={() => window.location.reload()} className="rounded px-2 py-1 text-lg" aria-label="Refresh">↻</button>
+          </div>
         </div>
       </header>
 
@@ -116,19 +124,20 @@ export function Layout({ user, onLogout }: { user: User; onLogout: () => void })
             to={to}
             end={to === "/"}
             onClick={() => setMore(false)}
-            className={({ isActive }) => `relative flex h-16 flex-col items-center justify-center gap-0.5 text-xs ${isActive && !more ? "text-blue-600 dark:text-blue-400" : "text-slate-600 dark:text-slate-400"}`}
+            className={({ isActive }) => {
+              const [p, query] = to.split("?");
+              const active = query ? loc.pathname === p && (new URLSearchParams(loc.search).get("tab") ?? "shorts") === new URLSearchParams(query).get("tab") : isActive;
+              return `relative flex h-16 flex-col items-center justify-center gap-0.5 text-xs ${active && !more ? "text-blue-600 dark:text-blue-400" : "text-slate-600 dark:text-slate-400"}`;
+            }}
           >
             <Icon name={icon} />
             {label}
-            {to === "/alerts" && unread > 0 && (
-              <span className="absolute right-[22%] top-2 min-w-5 rounded-full bg-rose-600 px-1 text-center text-[10px] font-semibold text-white">{unread > 99 ? "99+" : unread}</span>
-            )}
           </NavLink>
         ))}
         <button
           onClick={() => setMore(!more)}
           aria-expanded={more}
-          className={`flex h-16 flex-col items-center justify-center gap-0.5 text-xs ${more || !TABS.some(([t]) => t === loc.pathname) ? "text-blue-600 dark:text-blue-400" : "text-slate-600 dark:text-slate-400"}`}
+          className={`flex h-16 flex-col items-center justify-center gap-0.5 text-xs ${more || !["/", "/radar", "/media"].includes(loc.pathname) ? "text-blue-600 dark:text-blue-400" : "text-slate-600 dark:text-slate-400"}`}
         >
           <Icon name="menu" />
           More
@@ -142,11 +151,12 @@ export function Layout({ user, onLogout }: { user: User; onLogout: () => void })
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 text-sm text-slate-500">
-              {user.display_name} · {user.role}
+              {user.display_name} · {user.role} ·{" "}
+              <span className="rounded bg-emerald-100 px-1.5 text-[10px] font-semibold uppercase text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">local · zero-cost</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {links
-                .filter(([to]) => !TABS.some(([t]) => t === to))
+              {[...links, ["/alerts", `Alerts${unread ? ` (${unread})` : ""}`] as [string, string]]
+                .filter(([to]) => !["/", "/radar", "/media"].includes(to))
                 .map(([to, label]) => (
                   <NavLink
                     key={to}

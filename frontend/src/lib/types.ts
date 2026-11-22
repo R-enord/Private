@@ -20,6 +20,17 @@ export interface SourceRef {
   url: string | null;
 }
 
+export interface MediaInfo {
+  platform: string;
+  format: string;
+  id?: string | null;
+  embed?: string | null;
+  thumbnail?: string | null;
+  duration_s?: number | null;
+  channel?: string;
+  vertical?: boolean;
+}
+
 export interface ItemCard {
   id: number;
   kind: string;
@@ -48,6 +59,7 @@ export interface ItemCard {
   ai_summary: { summary: string; model: string; status: string } | null;
   bookmarked: boolean;
   is_fixture: boolean;
+  media?: MediaInfo | null;
   relation?: string;
 }
 

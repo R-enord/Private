@@ -1,0 +1,4 @@
+{"items": [
+ {"id": {"kind": "youtube#video", "videoId": "DDDDDDDDDD4"}, "snippet": {"publishedAt": "2026-11-22T08:00:00Z", "channelId": "UCx", "title": "MCP servers explained in 45 seconds", "description": "Model Context Protocol quick explainer", "channelTitle": "Dev Shorts"}},
+ {"id": {"kind": "youtube#video", "videoId": "EEEEEEEEEE5"}, "snippet": {"publishedAt": "2026-11-21T08:00:00Z", "channelId": "UCy", "title": "Building AI agents with LangGraph — full course", "description": "LLM agents tutorial", "channelTitle": "Agent Academy"}}
+]}
