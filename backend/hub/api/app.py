@@ -20,7 +20,7 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from hub import __version__
-from hub.api import routes_admin, routes_items, routes_user
+from hub.api import routes_admin, routes_community, routes_items, routes_user
 from hub.config import get_settings
 
 CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
@@ -65,6 +65,7 @@ def create_app() -> FastAPI:
     app.include_router(routes_admin.router)
     app.include_router(routes_items.router)
     app.include_router(routes_user.router)
+    app.include_router(routes_community.router)
 
     @app.get("/api/health")
     def health() -> dict[str, Any]:

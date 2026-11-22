@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { api, setUnauthorizedHandler } from "./lib/api";
 import type { User } from "./lib/types";
 import { Layout } from "./components/Layout";
+import { ArticleEditor, ArticleView, Community } from "./pages/Community";
 import { Feed } from "./pages/Feed";
 import { Home } from "./pages/Home";
 import { ItemDetail } from "./pages/ItemDetail";
@@ -41,6 +42,10 @@ export default function App() {
           <Route path="opportunities" element={<Opportunities />} />
           <Route path="timeline" element={<Timeline />} />
           <Route path="stack" element={<StackExplorer />} />
+          <Route path="community" element={<Community />} />
+          <Route path="community/new" element={<ArticleEditor />} />
+          <Route path="community/edit/:id" element={<ArticleEditor />} />
+          <Route path="community/:slug" element={<ArticleView />} />
           <Route path="*" element={<p>Not found.</p>} />
         </Route>
       </Routes>

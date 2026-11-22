@@ -11,6 +11,7 @@ const NAV: [string, string, string?][] = [
   ["/timeline", "Timeline"],
   ["/stack", "Stack Explorer"],
   ["/reports", "Reports"],
+  ["/community", "Community"],
   ["/watchlists", "Watchlists"],
   ["/sources", "Sources", "admin"],
   ["/ops", "Operations", "admin"],
