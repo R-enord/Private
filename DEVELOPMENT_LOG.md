@@ -91,3 +91,83 @@ Key findings:
 - Per-repo GitHub endpoints can't be verified live from this container.
 
 **Next:** Postgres job queue, scheduler and worker; then API, UI and AI.
+
+## 2026-11-22 — Phase 1–2 increment 2: queue, worker, AI, API
+
+**Built**
+- Postgres job queue (SKIP LOCKED, dedupe, backoff, dead-letter, defer, stale recovery).
+- Advisory-lock scheduler with periodic jobs; worker process with heartbeats and graceful stop.
+- AI provider manager: Ollama loopback-only, cloud models refused, cache, circuit breaker, privacy gating.
+- Grounding validator; local embeddings and SQL-cosine semantic search.
+- Deterministic alerts and reports.
+- FastAPI: auth (scrypt, server sessions, lockout), CSRF header, Origin and Host checks, CSP; all read and
+  admin endpoints; SSE.
+- CLI.
+
+**Verified**
+- `uv run pytest -q` → 120 passed.
+- `ruff check` → clean; `mypy hub` → clean.
+- Live grounded summary with qwen2.5:1.5b in **20.4 s**; re-run from cache in **0.01 s**.
+
+**Fixed during verification**
+- Provider error state was rolled back with the failed task → state is now committed before re-raising.
+- Final worker stats were not written on stop → `stop()` now writes them.
+- Global reports could duplicate because NULL owner values count as distinct → migration 0002
+  (NULLS NOT DISTINCT).
+
+## 2026-11-22 — increment 3: web UI, arXiv lookups, inorganic-star discount, community
+
+**Built**
+- Vite/React/TS/Tailwind UI covering every page. Charts follow the data-viz method: validated colors,
+  table views, hover.
+- arXiv `id_list` lookups for papers first seen on HN/HF.
+- Adoption discount for stars accrued with 0 forks (seen live: a new repo with 337 stars and 0 forks ranked #1).
+- Community slice: articles, comments, likes, author pages, moderation.
+- Makefile, Dockerfile, docker-compose (loopback-only), systemd and launchd units.
+- `HUB_OLLAMA_TRUSTED_HOSTS` for container networks.
+
+**Fixed during verification**
+- pnpm installed TypeScript 7, which typescript-eslint does not support → pinned TS 6.
+- `@vitejs/plugin-react@6` needs Vite 8 → upgraded Vite.
+- ESLint (react-hooks) flagged a component defined during render → hoisted.
+- The `hub` console script was missing its editable `.pth` → reinstalled the package.
+
+## 2026-11-22 — end-to-end verification (live system, real data)
+
+All of the following ran against the dev database with real sources, using `hub serve` + `hub worker` as
+separate processes.
+
+| Scenario | Command / method | Result |
+|---|---|---|
+| Browser closed | No UI client after the 12:22 Playwright session; only the worker running | Items **811 → 851** (12:27 → 12:37 UTC), AI summaries 18 → 21; scheduler-driven runs at 12:35 (hf-trending-models) and 12:37 (hn-ai-stories) |
+| UI renders with live data | Playwright login + 11 pages screenshotted | All pages rendered; only console error was the expected pre-login 401 on `/api/auth/me` |
+| Ollama stopped | `pkill -f "ollama serve"`, then `hub run-source hn-ai-stories --force` | Ingestion OK (**27 new**, 93 non-AI filtered); provider status `unavailable`; queued `ai_enrich` job **deferred** (status queued, attempts 0, reason recorded); Ollama restarted afterwards |
+| Internet unavailable | `HTTPS_PROXY=http://127.0.0.1:9 hub run-source hf-trending-spaces --force` | `error` after 4 attempts (1 + 3 retries); health `degraded`, backoff set, no crash; local full-text search still returned 21 results |
+| Worker crash | `run-now` on hf-org-models, `kill -9` the worker mid-job, start a new worker | Job 49 re-queued after the heartbeat went stale (`recovered after worker loss: vm:6169:…`) and **succeeded** |
+| Zero-cost | `HUB_ZERO_COST_MODE=false hub status`; `HUB_OLLAMA_URL=https://ollama.com hub doctor`; `HUB_CLOUD_AI_ENABLED=true` + direct calls to api.openai.com and openrouter.ai | Refused to start (validation error); Ollama URL blocked; no cloud provider constructed; both paid calls **blocked before any network I/O** (log outcome `blocked`) |
+| Backup/restore | `hub backup` (1.2 MB dump), restored twice into a scratch DB | First attempt **failed** (pg_restore tried to drop the superuser-owned `pg_trgm`). Fixed: skip extension TOC entries and surface stderr. Rerun: counts identical (838 items, 1,249 raw, 1 user, alembic 0002). Added `tests/test_backup.py` |
+| Compose | `HUB_DB_PASSWORD=x docker compose --profile ai config` | Valid; host ports bound only to `127.0.0.1` (api, db, ollama). Image build **not run**: no Docker daemon in the build container |
+
+**Final checks** (see the end of this log for exact output).
+
+**Limitations**
+- GitHub releases is unverified live here (container proxy scoping).
+- Cloud AI providers are unverified, so they stay blocked.
+- Lab feeds await owner terms review.
+- The Docker image is unbuilt here.
+- Phase 3 sources and Phase 5–6 extras (follows, submissions, notifications delivery) are not started.
+
+### Final check output (2026-11-22)
+
+```
+backend:  uv run pytest -q              → 131 passed, 1 warning (starlette httpx deprecation)
+          uv run ruff check hub tests   → All checks passed!
+          uv run mypy hub               → Success: no issues found in 48 source files
+          uv run alembic check          → No new upgrade operations detected.
+frontend: pnpm typecheck / pnpm lint    → ok / ok
+          pnpm test                     → 4 passed
+          pnpm build                    → dist/assets/index-*.js 335.74 kB (gzip 102.08 kB)
+```
+
+**Next:** owner runs `make doctor` on the real machine and reviews and enables lab feeds; optional GitHub
+token; then Phase 3 source audits (Reddit, Product Hunt, GitLab, Codeberg).
