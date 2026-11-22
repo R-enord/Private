@@ -65,6 +65,14 @@ class ArxivConnector(Connector):
     version = "1"
 
     def fetch(self, ctx: ConnectorContext) -> Iterator[RawRecord]:
+        if ctx.config.get("id_list"):
+            # Targeted lookup of papers first seen elsewhere (HN, HF papers): official metadata + corroboration.
+            ids = [str(i) for i in ctx.config["id_list"]][:50]
+            res = ctx.http.get(API, params={"id_list": ",".join(ids), "max_results": len(ids)})
+            for e in parse_feed(res.content):
+                yield RawRecord(external_id=f"arxiv:{e['arxiv_id']}", url=f"https://arxiv.org/abs/{e['arxiv_id']}",
+                                payload=e)
+            return
         query = ctx.config.get("search_query", "cat:cs.AI")
         page_size = min(2000, int(ctx.config.get("page_size", 100)))
         max_pages = int(ctx.config.get("max_pages", 3))

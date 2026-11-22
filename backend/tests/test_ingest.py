@@ -33,7 +33,7 @@ def sid(key: str) -> int:
         return s.scalar(select(Source.id).where(Source.key == key))
 
 
-def run(key: str, transport=TRANSPORT, **kw):
+def run(key: str, transport=TRANSPORT, **kw):  # noqa: ANN001
     return run_source(sid(key), transport=transport, sleep=no_sleep, now=kw.pop("now", NOW), is_fixture=True,
                       force=kw.pop("force", False), **kw)
 
@@ -331,3 +331,35 @@ def test_near_duplicate_articles_flagged_not_merged(db) -> None:
     finally:
         with session_scope() as s:
             s.execute(Source.__table__.delete().where(Source.key == "test-dupe-feed"))
+
+
+def test_arxiv_lookup_fills_abstract_for_hn_paper_and_keeps_schedule(db) -> None:
+    from hub.worker.jobs import enqueue_arxiv_lookups
+
+    rh = run("hn-ai-stories")
+    entry = """<feed xmlns="http://www.w3.org/2005/Atom"><entry><id>http://arxiv.org/abs/2606.14068v1</id>
+      <published>2026-06-12T10:00:00Z</published><updated>2026-06-12T10:00:00Z</updated>
+      <title>Harsher on Male? Evaluating LLMs on Gender-Asymmetric Moral Framing in Conflicts</title>
+      <summary>We evaluate large language models on asymmetric moral framing.</summary>
+      <author><name>A. Researcher</name></author><category term="cs.CL"/></entry></feed>"""
+    seen = {}
+
+    def handler(req: httpx.Request) -> httpx.Response:
+        if req.url.host == "export.arxiv.org":
+            seen["id_list"] = req.url.params.get("id_list")
+            return httpx.Response(200, content=entry.encode())
+        return fixture_handler(req)
+
+    with session_scope() as s:
+        assert enqueue_arxiv_lookups(s, rh.new_item_ids) >= 1
+        src = s.scalar(select(Source).where(Source.key == "arxiv-ai"))
+        before_next = src.next_run_at
+    r = run("arxiv-ai", transport=httpx.MockTransport(handler), config_override={"id_list": ["2606.14068"]})
+    assert seen["id_list"] == "2606.14068" and r.merged == 1
+    with session_scope() as s:
+        it = s.scalar(select(Item).join(ItemKey, ItemKey.item_id == Item.id).where(ItemKey.key == "arxiv:2606.14068"))
+        assert "asymmetric moral framing" in it.summary, "official abstract filled in"
+        assert it.source_count == 2 and it.verification == "corroborated"
+        src = s.scalar(select(Source).where(Source.key == "arxiv-ai"))
+        assert src.next_run_at == before_next, "targeted lookup does not disturb the regular schedule"
+        assert s.scalar(select(func.count()).select_from(SourceCheckpoint).where(SourceCheckpoint.source_id == src.id)) == 0

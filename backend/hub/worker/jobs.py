@@ -43,6 +43,7 @@ def fetch_source(payload: dict[str, Any], job_id: int) -> dict[str, Any]:
     with session_scope() as s:
         if r.new_item_ids:
             queue.enqueue(s, "evaluate_alerts", {"item_ids": r.new_item_ids}, priority=60)
+            enqueue_arxiv_lookups(s, r.new_item_ids)
             if get_setting(s, "ai_enabled", True):
                 # Enrich only the most promising new items right away; the backfill handles the rest.
                 top = s.scalars(select(Item.id).where(Item.id.in_(r.new_item_ids)).order_by(Item.score.desc())
@@ -52,6 +53,35 @@ def fetch_source(payload: dict[str, Any], job_id: int) -> dict[str, Any]:
                                   max_attempts=3)
     return {"source": r.source_key, "status": r.status, "records": r.records, "new": r.new, "updated": r.updated,
             "merged": r.merged, "filtered": r.filtered, "http_requests": r.http_requests, "error": r.error[:500]}
+
+
+def arxiv_lookup(payload: dict[str, Any], job_id: int) -> dict[str, Any]:
+    from hub.models import Source
+    from hub.pipeline.ingest import run_source
+
+    with session_scope() as s:
+        src = s.scalar(select(Source).where(Source.connector_type == "arxiv", Source.enabled.is_(True)))
+        if src is None:
+            return {"skipped": "arXiv source disabled"}
+        sid = src.id
+    r = run_source(sid, job_id=job_id, transport=_TRANSPORT_OVERRIDE, sleep=_SLEEP_OVERRIDE,
+                   is_fixture=_TRANSPORT_OVERRIDE is not None, config_override={"id_list": payload["ids"]})
+    return {"status": r.status, "records": r.records, "merged": r.merged, "updated": r.updated, "error": r.error[:300]}
+
+
+def enqueue_arxiv_lookups(session: Any, item_ids: list[int]) -> int:
+    """Papers first seen via HN/HF without an arXiv record get their official metadata fetched (batched)."""
+    rows = session.execute(text(
+        "SELECT DISTINCT substring(k.key from 7) FROM item_keys k JOIN items i ON i.id = k.item_id "
+        "WHERE k.item_id = ANY(:ids) AND k.key LIKE 'arxiv:%' AND NOT EXISTS ("
+        "  SELECT 1 FROM item_sources s JOIN sources src ON src.id = s.source_id "
+        "  WHERE s.item_id = i.id AND src.connector_type = 'arxiv')"), {"ids": item_ids}).scalars().all()
+    ids = sorted(r for r in rows if r)
+    for start in range(0, len(ids), 50):
+        chunk = ids[start:start + 50]
+        queue.enqueue(session, "arxiv_lookup", {"ids": chunk}, dedupe_key="arxiv:" + ",".join(chunk)[:280],
+                      priority=70, max_attempts=3)
+    return len(ids)
 
 
 def ai_enrich(payload: dict[str, Any], job_id: int) -> dict[str, Any]:
@@ -137,6 +167,7 @@ def evaluate_alerts(payload: dict[str, Any], job_id: int) -> dict[str, Any]:
 
 HANDLERS: dict[str, Callable[[dict[str, Any], int], dict[str, Any]]] = {
     "fetch_source": fetch_source,
+    "arxiv_lookup": arxiv_lookup,
     "ai_enrich": ai_enrich,
     "embed_items": embed_items,
     "rescore": rescore,

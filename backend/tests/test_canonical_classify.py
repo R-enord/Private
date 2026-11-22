@@ -131,3 +131,15 @@ def test_growth_from_snapshots() -> None:
     now = dt.datetime(2026, 11, 22, 12, tzinfo=dt.UTC)
     g = growth_from_snapshots("stars", [(now - dt.timedelta(hours=12), 100), (now, 160)], None, now, 160)
     assert g and g.method == "snapshots" and g.per_day == pytest.approx(120)
+
+
+def test_stars_without_forks_are_discounted_and_explained() -> None:
+    now = dt.datetime(2026, 11, 22, tzinfo=dt.UTC)
+    base = dict(kind="repository", published_at=now - dt.timedelta(days=1), discovered_at=now,
+                created_at=now - dt.timedelta(days=1), verification="primary", relevance=0.9, relevance_terms=["llm"],
+                distinct_publishers=1, publishers=["GitHub"], has_license=True, summary_len=80, links={},
+                growth=[Growth("stars", 300, "since_creation", 24)])
+    organic = compute_score(ScoreInput(**base, metrics={"stars": 300, "forks": 25}), now)[1]["adoption"]
+    farmed = compute_score(ScoreInput(**base, metrics={"stars": 300, "forks": 0}), now)[1]["adoption"]
+    assert farmed["value"] == pytest.approx(organic["value"] / 2)
+    assert "0 forks" in farmed["evidence"] and "inferred" in farmed["evidence"]

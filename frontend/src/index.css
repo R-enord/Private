@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+/* Data-viz role tokens (validated: series #2a78d6 light / #3987e5 dark pass all checks vs surfaces). */
+.viz-root {
+  color-scheme: light;
+  --surface-1: #fcfcfb;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --grid: #e7e6e2;
+  --series-1: #2a78d6;
+}
+@media (prefers-color-scheme: dark) {
+  .viz-root {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --grid: #383835;
+    --series-1: #3987e5;
+  }
+}
+
+/* Status colors are reserved for health/state and always shipped with an icon + label. */
+:root {
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+}
+
+.prose-report h1 { font-size: 1.4rem; font-weight: 700; margin: 0.5rem 0 1rem; }
+.prose-report h2 { font-size: 1.1rem; font-weight: 650; margin: 1.5rem 0 0.5rem; }
+.prose-report p { margin: 0.5rem 0; }
+.prose-report ul { list-style: disc; padding-left: 1.25rem; }
+.prose-report li { margin: 0.6rem 0; line-height: 1.45; }
+.prose-report a { color: #2563eb; text-decoration: underline; }
+@media (prefers-color-scheme: dark) { .prose-report a { color: #60a5fa; } }

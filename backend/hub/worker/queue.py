@@ -18,7 +18,6 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from hub.db import rowcount
-
 from hub.models import Job
 
 

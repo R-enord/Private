@@ -123,8 +123,13 @@ def compute_score(si: ScoreInput, now: dt.datetime, weights: dict[str, float] | 
         v = _log_norm(si.metrics["hf_trending"], 800.0)
         if v > best[0]:
             best = (v, f"Hugging Face trendingScore {si.metrics['hf_trending']:.0f} (reported by HF)")
-    comps["adoption"] = {"value": round(best[0], 4), "kind": "measured" if best[0] > 0 else "none",
-                         "evidence": best[1]}
+    adoption_v, adoption_ev = best
+    stars, forks = si.metrics.get("stars"), si.metrics.get("forks")
+    if stars is not None and forks is not None and stars >= 50 and forks == 0 and adoption_v > 0:
+        adoption_v *= 0.5
+        adoption_ev += f"; discounted 50%: {stars:.0f} stars but 0 forks (pattern often seen with inorganic stars; inferred)"
+    comps["adoption"] = {"value": round(adoption_v, 4), "kind": "measured" if adoption_v > 0 else "none",
+                         "evidence": adoption_ev}
 
     # utility (inferred heuristics)
     u = 0.0

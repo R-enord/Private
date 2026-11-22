@@ -463,7 +463,8 @@ def build_client(source: Source, transport: httpx.BaseTransport | None = None,
 
 def run_source(source_id: int, *, job_id: int | None = None, transport: httpx.BaseTransport | None = None,
                sleep: Callable[[float], None] | None = None, now: dt.datetime | None = None,
-               is_fixture: bool = False, force: bool = False) -> RunResult:
+               is_fixture: bool = False, force: bool = False,
+               config_override: dict[str, Any] | None = None) -> RunResult:
     settings = get_settings()
     now = now or dt.datetime.now(dt.UTC)
     with session_scope() as s:
@@ -490,7 +491,8 @@ def run_source(source_id: int, *, job_id: int | None = None, transport: httpx.Ba
                 ItemSource.source_id == source.id,
                 ItemSource.first_seen_at > now - dt.timedelta(hours=hours))))
 
-    ctx = ConnectorContext(source_id=source.id, source_key=source.key, config=dict(source.config or {}), http=client,
+    ctx = ConnectorContext(source_id=source.id, source_key=source.key,
+                           config={**(source.config or {}), **(config_override or {})}, http=client,
                            checkpoints=checkpoints, now=now, max_items=settings.max_items_per_run,
                            lookup_recent_external_ids=recent_ids)
     error: Exception | None = None
@@ -545,7 +547,10 @@ def run_source(source_id: int, *, job_id: int | None = None, transport: httpx.Ba
         src.rate_limit_remaining = client.last_rate.remaining
         src.rate_limit_reset_at = client.last_rate.reset_at
         src.updated_at = now
-        if error is None:
+        if error is None and config_override:
+            run.status = result.status = "ok"
+            run.error = "targeted lookup: " + ",".join(f"{k}" for k in config_override)
+        elif error is None:
             _save_checkpoints(s, src.id, ctx.staged)
             run.status = "not_modified" if ctx.not_modified and result.records == 0 else "ok"
             if ctx.warnings:
